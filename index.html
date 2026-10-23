@@ -124,8 +124,8 @@
             </div>
 
             <!-- Main Menu Graphic Preview -->
-            <div class="relative w-56 h-56 bg-neutral-900/80 border-2 border-neutral-800 rounded-full flex items-center justify-center my-1 shadow-2xl overflow-hidden">
-                <canvas id="menu-canvas" width="220" height="220" class="pointer-events-none"></canvas>
+            <div class="relative w-56 h-56 bg-neutral-900/80 border-2 border-neutral-800 rounded-full flex items-center justify-center my-1 shadow-2xl overflow-hidden cursor-pointer">
+                <canvas id="menu-canvas" width="220" height="220" class="pointer-events-auto"></canvas>
             </div>
 
             <!-- Menu Actions -->
@@ -305,293 +305,309 @@
                         <span id="ui-usage" class="font-bold text-yellow-400 text-sm ml-1">LOW</span>
                     </div>
                 </div>
-        let minigameState = {
-            active: false,
-            x: 50,
-            y: 250,
-            vy: 0,
-            vx: 0,
-            facingRight: true,
-            isGrounded: false,
-            phase: 'walk', // 'walk', 'pool_walk', 'drag', 'end'
-            timer: 0,
-            dragY: 0,
-            bubbles: [],
-            cameraX: 0
-        };
 
-        function startMinigame() {
-            minigameState = {
-                active: true,
-                x: 40,
-                y: 320,
-                vy: 0,
-                vx: 0,
-                facingRight: true,
-                isGrounded: false,
-                phase: 'walk',
-                timer: 0,
-                dragY: 0,
-                bubbles: [],
-                cameraX: 0
-            };
-            
-            // Initialize atmospheric bubbles
-            for (let i = 0; i < 25; i++) {
-                minigameState.bubbles.push({
-                    x: Math.random() * 1200,
-                    y: 200 + Math.random() * 200,
-                    r: Math.random() * 3 + 1,
-                    speed: Math.random() * 1.5 + 0.5,
-                    wobble: Math.random() * Math.PI * 2
+                <div class="flex items-center gap-4">
+                    <div id="ui-night" class="text-xs sm:text-sm font-bold text-neutral-300 uppercase tracking-widest bg-neutral-900/90 border border-neutral-700 px-3 py-1 rounded">
+                        NIGHT 1
+                    </div>
+                    <div id="ui-time" class="text-xl sm:text-2xl font-crt font-bold text-emerald-400 tracking-wider bg-neutral-900/90 border border-neutral-700 px-3 py-1 rounded">
+                        12 AM
+                    </div>
+                </div>
+            </div>
+
+            <!-- Office View Canvas -->
+            <div class="relative w-full h-full flex items-center justify-center">
+                <canvas id="office-canvas" width="800" height="450" class="w-full h-full object-cover"></canvas>
+
+                <!-- Left Door / Light Controls -->
+                <div class="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2 bg-neutral-900/80 p-2 rounded-lg border border-neutral-700">
+                    <button id="btn-door-left" class="w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition active:scale-95 bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700">
+                        <i class="fa-solid fa-door-closed text-base"></i> DOOR
+                    </button>
+                    <button id="btn-light-left" class="w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition active:scale-95 bg-neutral-800 border-yellow-600 text-yellow-500 hover:bg-neutral-700">
+                        <i class="fa-solid fa-lightbulb text-base"></i> LIGHT
+                    </button>
+                </div>
+
+                <!-- Right Door / Light Controls -->
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2 bg-neutral-900/80 p-2 rounded-lg border border-neutral-700">
+                    <button id="btn-door-right" class="w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition active:scale-95 bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700">
+                        <i class="fa-solid fa-door-closed text-base"></i> DOOR
+                    </button>
+                    <button id="btn-light-right" class="w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition active:scale-95 bg-neutral-800 border-yellow-600 text-yellow-500 hover:bg-neutral-700">
+                        <i class="fa-solid fa-lightbulb text-base"></i> LIGHT
+                    </button>
+                </div>
+
+                <!-- CAMERA MONITOR OVERLAY -->
+                <div id="camera-overlay" class="hidden absolute inset-0 z-20 bg-neutral-950 flex flex-col justify-between p-4">
+                    <!-- Top Monitor Header -->
+                    <div class="flex justify-between items-center z-10">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-600 cam-rec"></span>
+                            <span id="cam-title" class="font-bold text-red-500 text-sm tracking-wider">CAM 1: MAIN WEIGHT ROOM</span>
+                        </div>
+                        <div class="text-xs text-neutral-400 font-mono">
+                            LIVE FEED [SYS 24FPS]
+                        </div>
+                    </div>
+
+                    <!-- Camera Feed Canvas -->
+                    <div class="relative w-full h-[320px] bg-black border border-neutral-800 rounded overflow-hidden">
+                        <canvas id="camera-canvas" width="800" height="320" class="w-full h-full object-cover"></canvas>
+                    </div>
+
+                    <!-- Camera Map Nodes -->
+                    <div class="grid grid-cols-5 gap-2 z-10 text-xs">
+                        <button onclick="switchCamera(1)" class="cam-node-btn p-2 rounded border border-emerald-500 bg-emerald-950/60 font-bold hover:bg-emerald-900 transition">CAM 1</button>
+                        <button onclick="switchCamera(2)" class="cam-node-btn p-2 rounded border border-neutral-700 bg-neutral-800 font-bold hover:bg-neutral-700 transition">CAM 2</button>
+                        <button onclick="switchCamera(3)" class="cam-node-btn p-2 rounded border border-neutral-700 bg-neutral-800 font-bold hover:bg-neutral-700 transition">CAM 3</button>
+                        <button onclick="switchCamera(4)" class="cam-node-btn p-2 rounded border border-neutral-700 bg-neutral-800 font-bold hover:bg-neutral-700 transition">CAM 4</button>
+                        <button onclick="switchCamera(5)" class="cam-node-btn p-2 rounded border border-neutral-700 bg-neutral-800 font-bold hover:bg-neutral-700 transition">CAM 5</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Camera Flip Bar -->
+            <div class="w-full h-12 bg-neutral-900 border-t border-neutral-800 flex items-center justify-center p-2 z-30">
+                <button id="btn-toggle-cam" class="w-full max-w-xs py-1.5 bg-neutral-800 hover:bg-neutral-700 text-emerald-400 font-bold rounded border border-emerald-600/50 text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition active:scale-98">
+                    <i class="fa-solid fa-camera"></i> <span id="cam-toggle-text">FLIP MONITOR</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 6. JUMPSCARE / GAME OVER SCREEN             -->
+        <!-- ========================================== -->
+        <div id="screen-gameover" class="hidden absolute inset-0 z-50 bg-black flex flex-col items-center justify-center overflow-hidden">
+            <!-- Jumpscare Render Canvas -->
+            <div class="relative w-full h-full flex items-center justify-center">
+                <canvas id="jumpscare-canvas" width="400" height="400" class="jumpscare-anim z-10 pointer-events-none"></canvas>
+                <div id="death-fade-overlay" class="absolute inset-0 z-20 pointer-events-none"></div>
+            </div>
+
+            <!-- Game Over Menu Overlay -->
+            <div id="death-text-hud" class="hidden absolute z-30 flex flex-col items-center space-y-4 text-center">
+                <h2 class="text-6xl font-pixel text-red-600 tracking-wider drop-shadow-[0_0_20px_rgba(220,38,38,1)] uppercase">
+                    GAME OVER
+                </h2>
+                <p class="text-neutral-400 text-sm italic">Jonathan squeezed out your gains.</p>
+                <button id="btn-retry" class="px-8 py-3 bg-red-950 hover:bg-red-900 text-red-100 font-bold rounded border-2 border-red-700 transition uppercase tracking-wider text-base shadow-xl">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Try Shift Again
+                </button>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 7. SHIFT SURVIVED (WIN) SCREEN              -->
+        <!-- ========================================== -->
+        <div id="screen-win" class="hidden absolute inset-0 z-40 bg-neutral-950 flex flex-col items-center justify-center p-8 text-center space-y-6">
+            <h2 class="text-6xl font-crt font-bold text-emerald-400 tracking-widest drop-shadow-[0_0_15px_rgba(16,185,129,0.8)]">
+                6:00 AM
+            </h2>
+            <div class="space-y-2">
+                <h3 class="text-3xl font-bold text-yellow-400 uppercase tracking-wide">SHIFT SURVIVED!</h3>
+                <p id="win-night-subtext" class="text-neutral-400 text-sm">You survived Night 1 at Jonathan's Gym!</p>
+            </div>
+            <button id="btn-next-night" class="px-8 py-3 bg-emerald-950 hover:bg-emerald-900 text-emerald-100 font-bold rounded border-2 border-emerald-600 transition uppercase tracking-wider text-lg shadow-xl">
+                Continue Next Shift <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 8. 8-BIT POOL SIDESCROLLER MINIGAME        -->
+        <!-- ========================================== -->
+        <div id="screen-minigame" class="hidden absolute inset-0 z-50 bg-black flex flex-col items-center justify-between p-4">
+            <div class="w-full flex justify-between items-center text-xs font-pixel text-neutral-400">
+                <span>MEMORIES OF CRUMMY GYM</span>
+                <span id="minigame-objective" class="text-yellow-400">OBJECTIVE: WALK TO THE POOL AREA</span>
+            </div>
+
+            <!-- Minigame Canvas Viewport -->
+            <div class="relative w-full max-w-3xl h-[340px] border-4 border-neutral-800 bg-neutral-950 rounded overflow-hidden">
+                <canvas id="minigame-canvas" width="600" height="340" class="w-full h-full object-cover"></canvas>
+            </div>
+
+            <!-- On-Screen Controls for Touch / Mobile -->
+            <div class="w-full max-w-sm flex justify-between items-center gap-4">
+                <button id="mg-btn-left" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600 active:bg-neutral-600">
+                    <i class="fa-solid fa-arrow-left"></i> LEFT
+                </button>
+                <button id="mg-btn-right" class="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600 active:bg-neutral-600">
+                    RIGHT <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT GAME LOGIC                      -->
+    <!-- ========================================== -->
+    <script>
+        // WEB AUDIO SOUND SYSTEM (Self-Contained Synthesizer + Fallback Audio Loaders)
+        class SoundSystem {
+            constructor() {
+                this.ctx = null;
+                this.jumpscareAudio = new Audio('jonothan jumpscare.mp3');
+                this.voicelineAudio = new Audio('jonathan voiceline.wav');
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playClick() {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.05);
+                } catch(e){}
+            }
+
+            playDoor() {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.2);
+                } catch(e){}
+            }
+
+            playStatic() {
+                if (!this.ctx) return;
+                try {
+                    const bufferSize = this.ctx.sampleRate * 0.1;
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const output = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        output[i] = Math.random() * 2 - 1;
+                    }
+                    const whiteNoise = this.ctx.createBufferSource();
+                    whiteNoise.buffer = buffer;
+                    const gain = this.ctx.createGain();
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                    whiteNoise.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    whiteNoise.start();
+                } catch(e){}
+            }
+
+            playChime() {
+                if (!this.ctx) return;
+                try {
+                    const freqs = [523.25, 659.25, 783.99, 1046.50];
+                    freqs.forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.15);
+                        gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.15);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.15 + 0.6);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(this.ctx.currentTime + idx * 0.15);
+                        osc.stop(this.ctx.currentTime + idx * 0.15 + 0.6);
+                    });
+                } catch(e){}
+            }
+
+            playJumpscareScream() {
+                this.jumpscareAudio.play().catch(() => {
+                    // Fallback synthesized scream if audio file fails
+                    if (!this.ctx) return;
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                        osc.frequency.linearRampToValueAtTime(700, this.ctx.currentTime + 0.3);
+                        gain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.5);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + 1.5);
+                    } catch(e){}
                 });
             }
 
-            document.getElementById('minigameContainer').classList.remove('hidden');
-            requestAnimationFrame(minigameLoop);
-        }
-
-        function minigameLoop() {
-            if (!minigameState.active) return;
-
-            const canvas = document.getElementById('minigameCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.imageSmoothingEnabled = false;
-
-            // Update Game State
-            minigameState.timer++;
-
-            if (minigameState.phase === 'walk' || minigameState.phase === 'pool_walk') {
-                // Physics & Input
-                if (keys['ArrowRight'] || keys['KeyD']) {
-                    minigameState.vx = 2.5;
-                    minigameState.facingRight = true;
-                } else if (keys['ArrowLeft'] || keys['KeyA']) {
-                    minigameState.vx = -2.5;
-                    minigameState.facingRight = false;
-                } else {
-                    minigameState.vx *= 0.7;
-                }
-
-                if ((keys['ArrowUp'] || keys['KeyW'] || keys['Space']) && minigameState.isGrounded) {
-                    minigameState.vy = -7.5;
-                    minigameState.isGrounded = false;
-                }
-
-                // Gravity & Movement
-                minigameState.vy += 0.4;
-                minigameState.x += minigameState.vx;
-                minigameState.y += minigameState.vy;
-
-                // Ground Collision
-                const groundY = 320;
-                if (minigameState.y >= groundY) {
-                    minigameState.y = groundY;
-                    minigameState.vy = 0;
-                    minigameState.isGrounded = true;
-                }
-
-                // Camera follow
-                minigameState.cameraX = Math.max(0, Math.min(minigameState.x - 200, 600));
-
-                // Pool trigger (Pool boundary at X = 750)
-                if (minigameState.x > 750 && minigameState.phase === 'walk') {
-                    minigameState.phase = 'pool_walk';
-                }
-
-                // Trigger underwater drowning drag sequence deep in pool
-                if (minigameState.x > 820) {
-                    minigameState.phase = 'drag';
-                    minigameState.timer = 0;
-                    minigameState.dragY = minigameState.y;
-                }
-            } else if (minigameState.phase === 'drag') {
-                // Dragging down physics and underwater animation
-                minigameState.dragY += 0.8;
-                minigameState.x += (880 - minigameState.x) * 0.05; // Pull towards center of underwater abyss
-
-                if (minigameState.timer > 240) { // ~4 seconds of eerie dragging
-                    minigameState.phase = 'end';
-                    setTimeout(() => {
-                        minigameState.active = false;
-                        document.getElementById('minigameContainer').classList.add('hidden');
-                        triggerJumpscare();
-                    }, 500);
-                }
+            speakVoiceline() {
+                this.voicelineAudio.play().catch(() => {});
             }
 
-            // --- RENDER MINIGAME ---
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(-Math.floor(minigameState.cameraX), 0);
-
-            // 1. Background Sky / Gym Wall Structure
-            ctx.fillStyle = "#0d1117";
-            ctx.fillRect(0, 0, 1200, 400);
-
-            // Parallax Tiled Wall (Background layer 1)
-            ctx.fillStyle = "#161b22";
-            for (let wx = 0; wx < 1200; wx += 40) {
-                for (let wy = 0; wy < 320; wy += 20) {
-                    ctx.fillRect(wx, wy, 38, 18);
-                }
-            }
-
-            // Background Parallax Gym Equipment & Signs
-            // Gym Sign
-            ctx.fillStyle = "#30363d";
-            ctx.fillRect(100, 80, 180, 50);
-            ctx.fillStyle = "#8b949e";
-            ctx.font = "12px monospace";
-            ctx.fillText("JONATHAN'S POOL", 120, 110);
-
-            // Locker & Bench decorations
-            ctx.fillStyle = "#21262d";
-            ctx.fillRect(350, 240, 60, 80);
-            ctx.fillRect(430, 240, 60, 80);
-            ctx.fillRect(520, 280, 120, 40);
-
-            // 2. Pool Water Area Structure
-            const poolX = 720;
-            const waterSurfaceY = 220;
-
-            // Deep blue underwater background
-            const waterGrad = ctx.createLinearGradient(poolX, waterSurfaceY, poolX, 400);
-            waterGrad.addColorStop(0, "#0284c7"); // Vibrant blue surface
-            waterGrad.addColorStop(0.5, "#0369a1");
-            waterGrad.addColorStop(1, "#0c4a6e"); // Dark abyss bottom
-            ctx.fillStyle = waterGrad;
-            ctx.fillRect(poolX, waterSurfaceY, 480, 180);
-
-            // Pool Wall & Tilework Rim
-            ctx.fillStyle = "#e2e8f0";
-            ctx.fillRect(poolX - 10, 200, 10, 120);
-            ctx.fillStyle = "#0284c7";
-            for (let ty = 200; ty < 320; ty += 10) {
-                ctx.fillRect(poolX - 10, ty, 10, 2);
-            }
-
-            // Solid Floor (Gym floor & Pool bottom tiles)
-            ctx.fillStyle = "#334155";
-            ctx.fillRect(0, 320, poolX, 80);
-            // Pool bottom tiled floor
-            ctx.fillStyle = "#0f172a";
-            ctx.fillRect(poolX, 380, 480, 20);
-            ctx.fillStyle = "#38bdf8";
-            for (let px = poolX; px < 1200; px += 20) {
-                ctx.fillRect(px, 380, 18, 20);
-            }
-
-            // Animated Rising Water Surface & Bubbles
-            ctx.fillStyle = "rgba(224, 242, 254, 0.6)";
-            for (let bx = poolX; bx < 1200; bx += 15) {
-                let waveY = waterSurfaceY + Math.sin((minigameState.timer * 0.08) + (bx * 0.05)) * 4;
-                ctx.fillRect(bx, waveY, 12, 3);
-            }
-
-            // Underwater Air Bubbles
-            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-            minigameState.bubbles.forEach(b => {
-                b.y -= b.speed;
-                b.wobble += 0.05;
-                let bx = b.x + Math.sin(b.wobble) * 3;
-                if (b.y < waterSurfaceY) b.y = 390;
-                ctx.beginPath();
-                ctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // 3. Render Player Sprite (8-bit Pixel Character)
-            let px = minigameState.x;
-            let py = minigameState.phase === 'drag' ? minigameState.dragY : minigameState.y;
-
-            if (minigameState.phase !== 'drag') {
-                // Walking / Jumping Player Sprite
-                ctx.fillStyle = "#f87171"; // Red Shirt
-                ctx.fillRect(px - 8, py - 24, 16, 16);
-                ctx.fillStyle = "#fca5a5"; // Skin Head
-                ctx.fillRect(px - 6, py - 36, 12, 12);
-                ctx.fillStyle = "#1e293b"; // Pants
-                ctx.fillRect(px - 7, py - 8, 14, 8);
-
-                // Animated Legs
-                let walkOffset = Math.sin(minigameState.timer * 0.3) * (Math.abs(minigameState.vx) > 0.1 ? 5 : 0);
-                ctx.fillRect(px - 6 + walkOffset, py, 4, 8);
-                ctx.fillRect(px + 2 - walkOffset, py, 4, 8);
-            } else {
-                // Struggling / Drowning Player Sprite underwater
-                let struggleX = px + Math.sin(minigameState.timer * 0.4) * 3;
-                let struggleY = py;
-
-                ctx.fillStyle = "#ef4444"; // Red Shirt
-                ctx.fillRect(struggleX - 8, struggleY - 20, 16, 16);
-                ctx.fillStyle = "#fca5a5"; // Head tilted back
-                ctx.fillRect(struggleX - 6, struggleY - 32, 12, 12);
-
-                // Bubbles coming out of mouth
-                if (minigameState.timer % 10 === 0) {
-                    minigameState.bubbles.push({
-                        x: struggleX,
-                        y: struggleY - 30,
-                        r: 2 + Math.random() * 2,
-                        speed: 1 + Math.random(),
-                        wobble: 0
-                    });
-                }
-
-                // 4. EERIE SILHOUETTE FIGURE PULLING PLAYER DOWN
-                // Shaded almost identically to the water (#0277bd / #0369a1 over #0284c7 water) for subtle, barely-distinguishable look
-                const figureY = struggleY + 12;
-                const figureX = struggleX - 2;
-
-                // Subtle dark water outline aura
-                ctx.fillStyle = "#025a91"; // Extremely subtle silhouette tone
-                ctx.fillRect(figureX - 14, figureY, 28, 48); // Broad shoulders & Body
-
-                // Detailed Man Silhouette Head
-                ctx.beginPath();
-                ctx.arc(figureX, figureY - 8, 11, 0, Math.PI * 2); // Head
-                ctx.fill();
-
-                // Detailed Arms grabbing legs
-                ctx.fillStyle = "#02609b"; // Slight contrast tone
-                // Left Arm
-                ctx.fillRect(figureX - 16, figureY + 4, 8, 22);
-                ctx.fillRect(figureX - 12, figureY - 12, 6, 18); // Hand reaching up
-                // Right Arm
-                ctx.fillRect(figureX + 8, figureY + 4, 8, 22);
-                ctx.fillRect(figureX + 6, figureY - 12, 6, 18); // Hand reaching up
-
-                // Legs stretching into the dark abyss below
-                ctx.fillStyle = "#024e7e";
-                ctx.fillRect(figureX - 10, figureY + 40, 8, 40);
-                ctx.fillRect(figureX + 2, figureY + 40, 8, 40);
-
-                // Glowing faint red eyes in the water abyss (optional subtle highlight)
-                ctx.fillStyle = "rgba(239, 68, 68, 0.4)";
-                ctx.fillRect(figureX - 5, figureY - 10, 2, 2);
-                ctx.fillRect(figureX + 3, figureY - 10, 2, 2);
-            }
-
-            ctx.restore();
-
-            // Controls Overlay hint
-            if (minigameState.phase === 'walk') {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-                ctx.font = "14px monospace";
-                ctx.fillText("Use WASD / Arrow Keys to Move", 15, 25);
-            }
-
-            if (minigameState.active) {
-                requestAnimationFrame(minigameLoop);
+            playBubbleSound() {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.15);
+                } catch(e){}
             }
         }
 
         const audio = new SoundSystem();
 
-        // ==========================================
+        // CANVAS DEFINITIONS
+        const menuCanvas = document.getElementById('menu-canvas');
+        const menuCtx = menuCanvas ? menuCanvas.getContext('2d') : null;
+
+        const officeCanvas = document.getElementById('office-canvas');
+        const officeCtx = officeCanvas ? officeCanvas.getContext('2d') : null;
+
+        const cameraCanvas = document.getElementById('camera-canvas');
+        const cameraCtx = cameraCanvas ? cameraCanvas.getContext('2d') : null;
+
+        const jumpscareCanvas = document.getElementById('jumpscare-canvas');
+        const jumpscareCtx = jumpscareCanvas ? jumpscareCanvas.getContext('2d') : null;
+
+        const minigameCanvas = document.getElementById('minigame-canvas');
+        const minigameCtx = minigameCanvas ? minigameCanvas.getContext('2d') : null;
+
+        // SPRITE ASSETS
+        const jonathanImg = new Image();
+        jonathanImg.src = 'jonathan.png';
+
+        // CHEAT & TRIGGER GLOBALS
+        let jonathanTapCount = 0;
+        let cheatCodeBuffer = "";
+        let modGodMode = false;
+        let modNightSpeed = 1;
+
         // GAME STATE & CONSTANTS
-        // ==========================================
         let currentNight = 1;
         let isCustomNight = false;
         let customAILevel = 20;
@@ -620,6 +636,7 @@
         let jonathanDoorTimer = 0;
         let jonathanMoveInterval = 4.5;
         let jonathanMoveTimer = 0;
+        let lastFrameTime = performance.now();
 
         // Detailed 2D Sidescroller Minigame State
         let minigameActive = false;
@@ -633,6 +650,7 @@
 
         // DRAW JONATHAN USING PNG SPRITE
         function drawJonathanSprite(ctx, x, y, width, height, creepyScale = 1.3) {
+            if (!ctx) return;
             ctx.save();
             ctx.translate(x, y);
             ctx.scale(creepyScale, creepyScale);
@@ -1360,9 +1378,35 @@
                         minigameCtx.fill();
                     });
 
-                    // Dark Silhouette Pulling Down
-                    minigameCtx.fillStyle = '#000000';
-                    minigameCtx.fillRect(sidePlayerX - 15, sidePlayerY + 30, 50, 120);
+                    // Subtle Man Silhouette Pulling Down
+                    const figX = sidePlayerX - 2;
+                    const figY = sidePlayerY + 20;
+
+                    // Subtle dark water outline aura
+                    minigameCtx.fillStyle = "rgba(2, 90, 145, 0.75)";
+                    minigameCtx.fillRect(figX - 14, figY, 28, 48);
+
+                    // Detailed Man Silhouette Head
+                    minigameCtx.beginPath();
+                    minigameCtx.arc(figX, figY - 8, 11, 0, Math.PI * 2);
+                    minigameCtx.fill();
+
+                    // Arms grabbing legs
+                    minigameCtx.fillStyle = "rgba(2, 96, 155, 0.85)";
+                    minigameCtx.fillRect(figX - 16, figY + 4, 8, 22);
+                    minigameCtx.fillRect(figX - 12, figY - 12, 6, 18);
+                    minigameCtx.fillRect(figX + 8, figY + 4, 8, 22);
+                    minigameCtx.fillRect(figX + 6, figY - 12, 6, 18);
+
+                    // Legs stretching into the dark abyss
+                    minigameCtx.fillStyle = "rgba(2, 78, 126, 0.9)";
+                    minigameCtx.fillRect(figX - 10, figY + 40, 8, 40);
+                    minigameCtx.fillRect(figX + 2, figY + 40, 8, 40);
+
+                    // Glowing faint red eyes
+                    minigameCtx.fillStyle = "rgba(239, 68, 68, 0.5)";
+                    minigameCtx.fillRect(figX - 5, figY - 10, 2, 2);
+                    minigameCtx.fillRect(figX + 3, figY - 10, 2, 2);
                 }
             }
 
@@ -1385,16 +1429,18 @@
         // EVENT LISTENERS & SECRET CHEATS
         // ==========================================
         // Mobile Jonathan Taps Listener on Menu Canvas
-        menuCanvas.addEventListener('click', () => {
-            jonathanTapCount++;
-            audio.playClick();
-            if (jonathanTapCount >= 5) {
-                // Visual Indicator for 5 Taps Reached
-                menuCtx.strokeStyle = '#ef4444';
-                menuCtx.lineWidth = 8;
-                menuCtx.strokeRect(0, 0, menuCanvas.width, menuCanvas.height);
-            }
-        });
+        if (menuCanvas) {
+            menuCanvas.addEventListener('click', () => {
+                jonathanTapCount++;
+                audio.playClick();
+                if (jonathanTapCount >= 5 && menuCtx) {
+                    // Visual Indicator for 5 Taps Reached
+                    menuCtx.strokeStyle = '#ef4444';
+                    menuCtx.lineWidth = 8;
+                    menuCtx.strokeRect(0, 0, menuCanvas.width, menuCanvas.height);
+                }
+            });
+        }
 
         // Mod Menu Desktop Key Cheat Code: "jonothan"
         window.addEventListener('keydown', (e) => {
@@ -1441,15 +1487,19 @@
         const btnMgLeft = document.getElementById('mg-btn-left');
         const btnMgRight = document.getElementById('mg-btn-right');
 
-        btnMgLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keysPressed['mobileLeft'] = true; });
-        btnMgLeft.addEventListener('touchend', (e) => { e.preventDefault(); keysPressed['mobileLeft'] = false; });
-        btnMgLeft.addEventListener('mousedown', () => keysPressed['mobileLeft'] = true);
-        btnMgLeft.addEventListener('mouseup', () => keysPressed['mobileLeft'] = false);
+        if (btnMgLeft) {
+            btnMgLeft.addEventListener('touchstart', (e) => { e.preventDefault(); keysPressed['mobileLeft'] = true; });
+            btnMgLeft.addEventListener('touchend', (e) => { e.preventDefault(); keysPressed['mobileLeft'] = false; });
+            btnMgLeft.addEventListener('mousedown', () => keysPressed['mobileLeft'] = true);
+            btnMgLeft.addEventListener('mouseup', () => keysPressed['mobileLeft'] = false);
+        }
 
-        btnMgRight.addEventListener('touchstart', (e) => { e.preventDefault(); keysPressed['mobileRight'] = true; });
-        btnMgRight.addEventListener('touchend', (e) => { e.preventDefault(); keysPressed['mobileRight'] = false; });
-        btnMgRight.addEventListener('mousedown', () => keysPressed['mobileRight'] = true);
-        btnMgRight.addEventListener('mouseup', () => keysPressed['mobileRight'] = false);
+        if (btnMgRight) {
+            btnMgRight.addEventListener('touchstart', (e) => { e.preventDefault(); keysPressed['mobileRight'] = true; });
+            btnMgRight.addEventListener('touchend', (e) => { e.preventDefault(); keysPressed['mobileRight'] = false; });
+            btnMgRight.addEventListener('mousedown', () => keysPressed['mobileRight'] = true);
+            btnMgRight.addEventListener('mouseup', () => keysPressed['mobileRight'] = false);
+        }
 
         // Standard Buttons
         document.getElementById('btn-start-game').addEventListener('click', () => startGame(1, false));
