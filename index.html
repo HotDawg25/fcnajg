@@ -381,35 +381,39 @@
         jonathanImg.src = 'jonathan.png';
 
         const aImg = new Image();
-        aImg.src = 'A_3.png';
+        aImg.src = 'A.png';
 
         // Audio Effects
         const jumpscareAudio = new Audio('jonothan jumpscare.mp3');
         const voicelineAudio = new Audio('jonathan voiceline.wav');
+        const laughAudio = new Audio('A laugh.mp3');
         
-        // Character A Laugh Audio data URI generated from base data or synthesis
-        const laughAudio = new Audio();
-        // Fallback tone synthesis if audio fails
+        // Fallback tone synthesis if audio fails or audio file is blocked
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playLaughSound() {
-            try {
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
-                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            } catch(e) {
-                console.log('Audio playback error', e);
+            if (laughAudio) {
+                laughAudio.currentTime = 0;
+                laughAudio.play().catch(e => {
+                    console.log('Audio file play fallback:', e);
+                    // Fallback synthetic laugh sound if file playback fails
+                    try {
+                        if (audioCtx.state === 'suspended') {
+                            audioCtx.resume();
+                        }
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+                        osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.3);
+                        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start();
+                        osc.stop(audioCtx.currentTime + 0.4);
+                    } catch(err) {}
+                });
             }
         }
 
@@ -421,10 +425,10 @@
         const officeCtx = officeCanvas ? officeCanvas.getContext('2d') : null;
 
         const cameraCanvas = document.getElementById('camera-canvas');
-        const cameraCtx = cameraCanvas ? cameraCanvas.getContext('2d') : null;
+        cameraCanvas ? cameraCanvas.getContext('2d') : null;
 
         const jumpscareCanvas = document.getElementById('jumpscare-canvas');
-        const jumpscareCtx = jumpscareCanvas ? jumpscareCanvas.getContext('2d') : null;
+        jumpscareCanvas ? jumpscareCanvas.getContext('2d') : null;
 
         let lastFrameTime = performance.now();
 
@@ -457,8 +461,8 @@
         let doorRight = false;
         let lightLeft = false;
         let lightRight = false;
-        let doorsDisabledLeft = false;
-        let doorsDisabledRight = false;
+        let doorsDisabledLeftTimer = 0; // Timers for 1/2 in-game hour disabling (11 seconds)
+        let doorsDisabledRightTimer = 0;
 
         // Camera Monitor
         let isCamMonitorOpen = false;
@@ -476,6 +480,8 @@
         let aMoveInterval = 3.5;
         let aMoveTimer = 0;
         let aInsideOffice = false;
+        let aBreachSide = null; // 'left' or 'right'
+        let aCrossTimer = 0; // Timer to attempt crossing to other door while in office
 
         // Draw Jonathan Sprite with fallback
         function drawJonathanSprite(ctx, x, y, width, height, creepyScale = 1.3) {
@@ -502,7 +508,7 @@
             if (aImg.complete && aImg.naturalWidth !== 0) {
                 ctx.drawImage(aImg, -width / 2, -height / 2, width, height);
             } else {
-                // Fallback rendering
+                // Fallback rendering using custom yellow shape with blue band
                 ctx.fillStyle = '#eab308';
                 ctx.beginPath();
                 ctx.roundRect(-width / 2, -height / 2, width, height, 10);
@@ -609,10 +615,10 @@
 
         function toggleDoor(side) {
             if (side === 'left') {
-                if (!doorsDisabledLeft) doorLeft = !doorLeft;
+                if (doorsDisabledLeftTimer <= 0) doorLeft = !doorLeft;
             }
             if (side === 'right') {
-                if (!doorsDisabledRight) doorRight = !doorRight;
+                if (doorsDisabledRightTimer <= 0) doorRight = !doorRight;
                 // Secret unlock check: if right door is closed and user unlocked clicks on menu
                 if (modMenuUnlocked && doorRight && document.getElementById('btn-open-mod-menu').classList.contains('hidden')) {
                     document.getElementById('btn-open-mod-menu').classList.remove('hidden');
@@ -629,13 +635,16 @@
         function updateDoorButtons() {
             const btnL = document.getElementById('btn-door-left');
             const btnR = document.getElementById('btn-door-right');
+            const isDisabledL = doorsDisabledLeftTimer > 0;
+            const isDisabledR = doorsDisabledRightTimer > 0;
+
             if (btnL) {
-                btnL.disabled = doorsDisabledLeft;
-                btnL.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${doorsDisabledLeft ? 'bg-neutral-950 border-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed' : (doorLeft ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700')}`;
+                btnL.disabled = isDisabledL;
+                btnL.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${isDisabledL ? 'bg-neutral-950 border-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed' : (doorLeft ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700')}`;
             }
             if (btnR) {
-                btnR.disabled = doorsDisabledRight;
-                btnR.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${doorsDisabledRight ? 'bg-neutral-950 border-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed' : (doorRight ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700')}`;
+                btnR.disabled = isDisabledR;
+                btnR.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${isDisabledR ? 'bg-neutral-950 border-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed' : (doorRight ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700')}`;
             }
         }
 
@@ -682,8 +691,8 @@
             doorRight = false;
             lightLeft = false;
             lightRight = false;
-            doorsDisabledLeft = false;
-            doorsDisabledRight = false;
+            doorsDisabledLeftTimer = 0;
+            doorsDisabledRightTimer = 0;
             isCamMonitorOpen = false;
             activeCam = 1;
 
@@ -692,6 +701,8 @@
             aLocation = 1;
             aDoorTimer = 0;
             aInsideOffice = false;
+            aBreachSide = null;
+            aCrossTimer = 0;
 
             const effectiveLevelJ = isCustomNight ? customAILevel : (currentNight * 4);
             const effectiveLevelA = isCustomNight ? customAIA_Level : (currentNight * 3);
@@ -717,18 +728,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        function gameLoop(now) {
-            if (isGameOver || isWin) return;
-
-            const dt = (now - lastFrameTime) / 1000;
-            lastFrameTime = now;
-
-            updateGame(dt);
-            renderGame();
-
-            requestAnimationFrame(gameLoop);
-        }
-
         function updateGame(dt) {
             const effectiveDt = modFastTime ? dt * 4 : dt;
 
@@ -742,6 +741,22 @@
                 }
                 const timeStr = gameTimeHour === 0 ? "12 AM" : `${gameTimeHour} AM`;
                 document.getElementById('ui-time').innerText = timeStr;
+            }
+
+            // Handle Door Disabling Duration (1/2 in-game hour = half of hourDuration, i.e. 11 seconds)
+            if (doorsDisabledLeftTimer > 0) {
+                doorsDisabledLeftTimer -= effectiveDt;
+                if (doorsDisabledLeftTimer <= 0) {
+                    doorsDisabledLeftTimer = 0;
+                    updateDoorButtons();
+                }
+            }
+            if (doorsDisabledRightTimer > 0) {
+                doorsDisabledRightTimer -= effectiveDt;
+                if (doorsDisabledRightTimer <= 0) {
+                    doorsDisabledRightTimer = 0;
+                    updateDoorButtons();
+                }
             }
 
             let usageFactor = 1;
@@ -807,7 +822,7 @@
                 }
             }
 
-            // Check Character A Door / Office Breach Mechanics
+            // Check Character A Door / Office Breach & Crossing Mechanics
             if (!aInsideOffice) {
                 if (aLocation === 6 || aLocation === 7) {
                     aDoorTimer += dt;
@@ -823,19 +838,45 @@
                     } else {
                         const maxDoorTime = isCustomNight ? Math.max(1.5, 3.5 - (customAIA_Level * 0.1)) : (4.0 - currentNight * 0.3);
                         if (aDoorTimer > maxDoorTime) {
-                            // Breaches office! Disables corresponding door
+                            // Breaches office! Disables corresponding door for 1/2 in-game hour (11 seconds)
                             aInsideOffice = true;
                             playLaughSound();
+                            aCrossTimer = 0;
+                            const halfInGameHour = hourDuration / 2;
+
                             if (aLocation === 6) {
-                                doorsDisabledLeft = true;
+                                aBreachSide = 'left';
+                                doorsDisabledLeftTimer = halfInGameHour;
                                 doorLeft = false;
                             } else if (aLocation === 7) {
-                                doorsDisabledRight = true;
+                                aBreachSide = 'right';
+                                doorsDisabledRightTimer = halfInGameHour;
                                 doorRight = false;
                             }
                             updateDoorButtons();
                         }
                     }
+                }
+            } else {
+                // Inside Office: laughs and attempts to cross to the opposite side to deactivate that door as well!
+                aCrossTimer += dt;
+                if (aCrossTimer >= 3.0) { // After 3 seconds inside, crosses over to deactivate opposite door
+                    const halfInGameHour = hourDuration / 2;
+                    playLaughSound();
+                    
+                    if (aBreachSide === 'left') {
+                        doorsDisabledRightTimer = halfInGameHour;
+                        doorRight = false;
+                    } else if (aBreachSide === 'right') {
+                        doorsDisabledLeftTimer = halfInGameHour;
+                        doorLeft = false;
+                    }
+                    updateDoorButtons();
+
+                    // Retreat back to Stage after crossing
+                    aInsideOffice = false;
+                    aLocation = 1;
+                    aBreachSide = null;
                 }
             }
         }
