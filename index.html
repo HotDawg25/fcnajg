@@ -97,6 +97,42 @@
     <!-- MAIN UI CONTAINER -->
     <div id="game-container" class="relative w-full max-w-5xl h-[650px] bg-neutral-950 border-4 border-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col justify-between">
         
+        <!-- MOD MENU TRIGGER BUTTON (Hidden by default, unlocked via secret combo) -->
+        <button id="btn-open-mod-menu" class="hidden absolute top-2 left-2 z-50 bg-purple-900/80 hover:bg-purple-800 text-purple-200 text-xs px-2.5 py-1 rounded border border-purple-500 shadow-md flex items-center gap-1 font-bold">
+            <i class="fa-solid fa-code"></i> MOD MENU
+        </button>
+
+        <!-- MOD MENU MODAL -->
+        <div id="modal-mod-menu" class="hidden absolute inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+            <div class="bg-neutral-900 border-2 border-purple-600 rounded-lg p-6 max-w-sm w-full text-left space-y-4 shadow-2xl text-purple-300">
+                <h3 class="text-2xl font-bold text-purple-400 border-b border-purple-800 pb-2 flex justify-between items-center">
+                    <span><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>MOD MENU</span>
+                    <button id="btn-close-mod-menu" class="text-neutral-400 hover:text-white text-lg">&times;</button>
+                </h3>
+                
+                <div class="space-y-3 text-sm">
+                    <label class="flex items-center justify-between bg-neutral-950 p-2 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Infinite Power</span>
+                        <input type="checkbox" id="mod-infinite-power" class="accent-purple-500 w-4 h-4">
+                    </label>
+
+                    <label class="flex items-center justify-between bg-neutral-950 p-2 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Disable Anim AI</span>
+                        <input type="checkbox" id="mod-disable-ai" class="accent-purple-500 w-4 h-4">
+                    </label>
+
+                    <label class="flex items-center justify-between bg-neutral-950 p-2 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Fast Shift Time</span>
+                        <input type="checkbox" id="mod-fast-time" class="accent-purple-500 w-4 h-4">
+                    </label>
+
+                    <button id="mod-instant-win" class="w-full py-2 bg-purple-900 hover:bg-purple-800 text-purple-100 font-bold rounded border border-purple-600 transition uppercase text-xs">
+                        <i class="fa-solid fa-trophy mr-1"></i> Skip Night (Instant Win)
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- ========================================== -->
         <!-- 1. START / MAIN MENU SCREEN               -->
         <!-- ========================================== -->
@@ -111,8 +147,8 @@
                 <p class="text-xs text-neutral-400 mt-1 italic">"Where gainz get uncanny."</p>
             </div>
 
-            <!-- Main Menu Graphic Preview -->
-            <div class="relative w-56 h-56 bg-neutral-900/80 border-2 border-neutral-800 rounded-full flex items-center justify-center my-1 shadow-2xl overflow-hidden">
+            <!-- Main Menu Graphic Preview (Clickable for Secret Mod Menu) -->
+            <div id="menu-avatar-container" class="relative w-56 h-56 bg-neutral-900/80 border-2 border-neutral-800 rounded-full flex items-center justify-center my-1 shadow-2xl overflow-hidden cursor-pointer hover:border-red-600 transition">
                 <canvas id="menu-canvas" width="220" height="220" class="pointer-events-none"></canvas>
             </div>
 
@@ -129,7 +165,7 @@
                         <i class="fa-solid fa-circle-info"></i> How to Play
                     </button>
                 </div>
-                <button id="btn-custom-night-menu" class="hidden w-full py-2.5 bg-yellow-950 hover:bg-yellow-900 text-yellow-400 font-bold rounded border-2 border-yellow-600 transition uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                <button id="btn-custom-night-menu" class="w-full py-2.5 bg-yellow-950 hover:bg-yellow-900 text-yellow-400 font-bold rounded border-2 border-yellow-600 transition uppercase tracking-wider text-sm flex items-center justify-center gap-2">
                     <i class="fa-solid fa-sliders"></i> Custom Night (Night 6)
                 </button>
             </div>
@@ -152,9 +188,6 @@
                     <button onclick="selectNight(4)" class="p-3 bg-neutral-800 hover:bg-yellow-600 hover:text-black border border-neutral-700 rounded text-xl font-bold transition">4</button>
                     <button onclick="selectNight(5)" class="p-3 bg-neutral-800 hover:bg-red-600 hover:text-white border border-neutral-700 rounded text-xl font-bold transition">5</button>
                 </div>
-                <div id="unlocked-cn-badge" class="hidden mb-4 p-2 bg-yellow-950/80 border border-yellow-600/60 rounded text-xs text-yellow-400 font-bold uppercase">
-                    <i class="fa-solid fa-trophy mr-1"></i> Night 6 (Custom Night) Unlocked!
-                </div>
                 <button id="btn-close-night-select" class="px-6 py-2 bg-neutral-700 hover:bg-neutral-600 text-sm rounded">Cancel</button>
             </div>
         </div>
@@ -165,14 +198,25 @@
         <div id="modal-custom-night" class="hidden absolute inset-0 z-40 bg-black/95 flex items-center justify-center p-6">
             <div class="bg-neutral-900 border-2 border-yellow-500 rounded-lg p-6 max-w-md w-full text-center space-y-4 shadow-2xl">
                 <h3 class="text-3xl font-crt font-bold text-yellow-400 tracking-wider uppercase border-b border-yellow-600/40 pb-2">CUSTOM NIGHT SETUP</h3>
-                <p class="text-xs text-neutral-400">Set Jonathan's AI Aggression Level (0 - 20)</p>
+                <p class="text-xs text-neutral-400">Set Aggression Levels (0 - 20)</p>
 
-                <div class="p-4 bg-neutral-950 border border-neutral-800 rounded-lg flex flex-col items-center justify-center space-y-3">
-                    <span class="text-sm font-bold text-yellow-500 uppercase tracking-wide">JONATHAN AI</span>
-                    <div class="flex items-center gap-4">
-                        <button onclick="adjustCustomAI(-1)" class="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded-lg border border-neutral-600 text-xl flex items-center justify-center">-</button>
-                        <span id="custom-ai-val" class="text-4xl font-crt font-bold text-emerald-400 w-16 text-center">20</span>
-                        <button onclick="adjustCustomAI(1)" class="w-10 h-10 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded-lg border border-neutral-600 text-xl flex items-center justify-center">+</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-neutral-950 border border-neutral-800 rounded-lg flex flex-col items-center justify-center space-y-2">
+                        <span class="text-xs font-bold text-yellow-500 uppercase tracking-wide">JONATHAN AI</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="adjustCustomAI('jonathan', -1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">-</button>
+                            <span id="custom-ai-val" class="text-2xl font-crt font-bold text-emerald-400 w-10 text-center">20</span>
+                            <button onclick="adjustCustomAI('jonathan', 1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">+</button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-neutral-950 border border-neutral-800 rounded-lg flex flex-col items-center justify-center space-y-2">
+                        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wide">CHARACTER A</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="adjustCustomAI('a', -1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">-</button>
+                            <span id="custom-ai-a-val" class="text-2xl font-crt font-bold text-cyan-400 w-10 text-center">20</span>
+                            <button onclick="adjustCustomAI('a', 1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">+</button>
+                        </div>
                     </div>
                 </div>
 
@@ -193,9 +237,10 @@
                     <i class="fa-solid fa-shield-halved"></i>
                 </h3>
                 <div class="text-sm text-neutral-300 space-y-2 max-h-80 overflow-y-auto pr-2">
-                    <p><strong class="text-yellow-400">OBJECTIVE:</strong> Survive 12 AM to 6 AM against Jonathan.</p>
-                    <p><strong class="text-yellow-400">MONITOR (CAMERAS):</strong> Open security cameras (CAM 1 to 5) to locate Jonathan.</p>
-                    <p><strong class="text-yellow-400">DOORS & LIGHTS:</strong> Toggle left/right door lights to check hall blindspots. Close doors if Jonathan is at your entrance!</p>
+                    <p><strong class="text-yellow-400">OBJECTIVE:</strong> Survive 12 AM to 6 AM against Jonathan & Character A.</p>
+                    <p><strong class="text-yellow-400">MONITOR (CAMERAS):</strong> Open cameras (CAM 1-5) to locate Jonathan and Character A. Character A laughs when nearby.</p>
+                    <p><strong class="text-cyan-400">CHARACTER A:</strong> Roams cameras and approaches doors. If he reaches your doorway and you aren't fast enough to close it, he breaches the office and permanently disables doors! Close doors preemptively to stop him.</p>
+                    <p><strong class="text-yellow-400">DOORS & LIGHTS:</strong> Toggle left/right door lights to check hall blindspots. Close doors if Jonathan or A is at your entrance!</p>
                 </div>
                 <div class="text-center pt-2">
                     <button id="btn-close-instructions" class="w-full py-2 bg-emerald-700 hover:bg-emerald-600 font-bold rounded text-white">Got It</button>
@@ -317,9 +362,10 @@
 
             <!-- "YOU DIED" HUD LAYER -->
             <div id="death-text-hud" class="relative z-30 flex flex-col items-center justify-center space-y-4 mt-4">
-                <h1 class="text-6xl sm:text-7xl font-crt font-bold text-red-600 tracking-widest uppercase drop-shadow-[0_0_20px_rgba(220,38,38,1)] animate-pulse">
+                <h1 id="death-title" class="text-6xl sm:text-7xl font-crt font-bold text-red-600 tracking-widest uppercase drop-shadow-[0_0_20px_rgba(220,38,38,1)] animate-pulse">
                     YOU DIED
                 </h1>
+                <p id="death-subtitle" class="text-sm text-red-400 uppercase tracking-widest font-bold">Jonathan got you!</p>
                 <button id="btn-retry" class="mt-4 px-8 py-3 bg-red-950 hover:bg-red-900 text-red-100 font-bold rounded-lg border-2 border-red-600 transition text-lg shadow-lg">
                     TRY AGAIN
                 </button>
@@ -330,13 +376,42 @@
 
     <!-- MAIN GAME SCRIPT -->
     <script>
-        // Load External Jonathan Sprite Image with Fallback placeholder
+        // Load External Sprites & Audio
         const jonathanImg = new Image();
         jonathanImg.src = 'jonathan.png';
 
-        // Load Audio Files
+        const aImg = new Image();
+        aImg.src = 'A_3.png';
+
+        // Audio Effects
         const jumpscareAudio = new Audio('jonothan jumpscare.mp3');
         const voicelineAudio = new Audio('jonathan voiceline.wav');
+        
+        // Character A Laugh Audio data URI generated from base data or synthesis
+        const laughAudio = new Audio();
+        // Fallback tone synthesis if audio fails
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playLaughSound() {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+                osc.frequency.exponentialRampToValueAtTime(250, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch(e) {
+                console.log('Audio playback error', e);
+            }
+        }
 
         // Canvas Initializations
         const menuCanvas = document.getElementById('menu-canvas');
@@ -357,7 +432,16 @@
         let currentNight = 1;
         let isCustomNight = false;
         let customAILevel = 20;
-        let unlockedCustomNight = false;
+        let customAIA_Level = 20;
+
+        // Secret Mod Menu Unlock Counter & State
+        let jonathanClickCount = 0;
+        let modMenuUnlocked = false;
+
+        // Mod Cheats State
+        let modInfinitePower = false;
+        let modDisableAI = false;
+        let modFastTime = false;
 
         let gameTimeHour = 0; 
         let hourDuration = 22; 
@@ -366,22 +450,32 @@
         let powerDrainRate = 0.05;
         let isGameOver = false;
         let isWin = false;
+        let killedBy = 'jonathan';
 
-        // Doors & Lights
+        // Doors & Lights & Breaches
         let doorLeft = false;
         let doorRight = false;
         let lightLeft = false;
         let lightRight = false;
+        let doorsDisabledLeft = false;
+        let doorsDisabledRight = false;
 
         // Camera Monitor
         let isCamMonitorOpen = false;
         let activeCam = 1;
 
-        // Jonathan AI State
+        // Animatronic State: Jonathan
         let jonathanLocation = 1;
         let jonathanDoorTimer = 0;
         let jonathanMoveInterval = 4.5;
         let jonathanMoveTimer = 0;
+
+        // Animatronic State: Character "A"
+        let aLocation = 1; // 1: Stage, 2: Treadmills, 3: Lockers, 4: Left Hall, 5: Right Hall, 6: Left Door, 7: Right Door
+        let aDoorTimer = 0;
+        let aMoveInterval = 3.5;
+        let aMoveTimer = 0;
+        let aInsideOffice = false;
 
         // Draw Jonathan Sprite with fallback
         function drawJonathanSprite(ctx, x, y, width, height, creepyScale = 1.3) {
@@ -400,11 +494,30 @@
             ctx.restore();
         }
 
+        // Draw Character "A" Sprite with image fallback
+        function drawASprite(ctx, x, y, width, height) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            if (aImg.complete && aImg.naturalWidth !== 0) {
+                ctx.drawImage(aImg, -width / 2, -height / 2, width, height);
+            } else {
+                // Fallback rendering
+                ctx.fillStyle = '#eab308';
+                ctx.beginPath();
+                ctx.roundRect(-width / 2, -height / 2, width, height, 10);
+                ctx.fill();
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(-width / 2, height / 4, width, height / 4);
+            }
+
+            ctx.restore();
+        }
+
         window.addEventListener('load', () => {
             renderMenuCanvas();
-            jonathanImg.onload = () => {
-                renderMenuCanvas();
-            };
+            jonathanImg.onload = () => { renderMenuCanvas(); };
+            aImg.onload = () => { renderMenuCanvas(); };
         });
 
         function renderMenuCanvas() {
@@ -421,6 +534,39 @@
 
             drawJonathanSprite(menuCtx, 110, 115, 140, 160, 1.35);
         }
+
+        // Secret Mod Menu Unlock Logic: Click Jonathan 5 times on menu, then close right door
+        document.getElementById('menu-avatar-container').addEventListener('click', () => {
+            jonathanClickCount++;
+            if (jonathanClickCount >= 5 && !modMenuUnlocked) {
+                modMenuUnlocked = true;
+                const btnMod = document.getElementById('btn-open-mod-menu');
+                if (btnMod) btnMod.classList.remove('hidden');
+                // Play feedback tone
+                playLaughSound();
+            }
+        });
+
+        // Mod Menu Event Listeners
+        document.getElementById('btn-open-mod-menu').addEventListener('click', () => {
+            document.getElementById('modal-mod-menu').classList.remove('hidden');
+        });
+        document.getElementById('btn-close-mod-menu').addEventListener('click', () => {
+            document.getElementById('modal-mod-menu').classList.add('hidden');
+        });
+        document.getElementById('mod-infinite-power').addEventListener('change', (e) => {
+            modInfinitePower = e.target.checked;
+        });
+        document.getElementById('mod-disable-ai').addEventListener('change', (e) => {
+            modDisableAI = e.target.checked;
+        });
+        document.getElementById('mod-fast-time').addEventListener('change', (e) => {
+            modFastTime = e.target.checked;
+        });
+        document.getElementById('mod-instant-win').addEventListener('click', () => {
+            document.getElementById('modal-mod-menu').classList.add('hidden');
+            if (!isGameOver) winNight();
+        });
 
         // Event Listeners setup
         document.getElementById('btn-start-game').addEventListener('click', () => startGame(1, false));
@@ -451,14 +597,27 @@
             startGame(n, false);
         }
 
-        function adjustCustomAI(val) {
-            customAILevel = Math.max(0, Math.min(20, customAILevel + val));
-            document.getElementById('custom-ai-val').innerText = customAILevel;
+        function adjustCustomAI(type, val) {
+            if (type === 'jonathan') {
+                customAILevel = Math.max(0, Math.min(20, customAILevel + val));
+                document.getElementById('custom-ai-val').innerText = customAILevel;
+            } else if (type === 'a') {
+                customAIA_Level = Math.max(0, Math.min(20, customAIA_Level + val));
+                document.getElementById('custom-ai-a-val').innerText = customAIA_Level;
+            }
         }
 
         function toggleDoor(side) {
-            if (side === 'left') doorLeft = !doorLeft;
-            if (side === 'right') doorRight = !doorRight;
+            if (side === 'left') {
+                if (!doorsDisabledLeft) doorLeft = !doorLeft;
+            }
+            if (side === 'right') {
+                if (!doorsDisabledRight) doorRight = !doorRight;
+                // Secret unlock check: if right door is closed and user unlocked clicks on menu
+                if (modMenuUnlocked && doorRight && document.getElementById('btn-open-mod-menu').classList.contains('hidden')) {
+                    document.getElementById('btn-open-mod-menu').classList.remove('hidden');
+                }
+            }
             updateDoorButtons();
         }
 
@@ -470,8 +629,14 @@
         function updateDoorButtons() {
             const btnL = document.getElementById('btn-door-left');
             const btnR = document.getElementById('btn-door-right');
-            if (btnL) btnL.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${doorLeft ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700'}`;
-            if (btnR) btnR.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${doorRight ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700'}`;
+            if (btnL) {
+                btnL.disabled = doorsDisabledLeft;
+                btnL.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${doorsDisabledLeft ? 'bg-neutral-950 border-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed' : (doorLeft ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700')}`;
+            }
+            if (btnR) {
+                btnR.disabled = doorsDisabledRight;
+                btnR.className = `w-12 h-12 border-2 rounded flex flex-col items-center justify-center text-xs font-bold transition ${doorsDisabledRight ? 'bg-neutral-950 border-neutral-800 text-neutral-600 opacity-50 cursor-not-allowed' : (doorRight ? 'bg-red-900 border-red-500 text-white' : 'bg-neutral-800 border-red-600 text-red-500 hover:bg-neutral-700')}`;
+            }
         }
 
         function toggleCameraMonitor() {
@@ -517,14 +682,22 @@
             doorRight = false;
             lightLeft = false;
             lightRight = false;
+            doorsDisabledLeft = false;
+            doorsDisabledRight = false;
             isCamMonitorOpen = false;
             activeCam = 1;
 
             jonathanLocation = 1;
             jonathanDoorTimer = 0;
+            aLocation = 1;
+            aDoorTimer = 0;
+            aInsideOffice = false;
 
-            const effectiveLevel = isCustomNight ? customAILevel : (currentNight * 4);
-            jonathanMoveInterval = Math.max(1.2, 5.5 - (effectiveLevel * 0.2));
+            const effectiveLevelJ = isCustomNight ? customAILevel : (currentNight * 4);
+            const effectiveLevelA = isCustomNight ? customAIA_Level : (currentNight * 3);
+
+            jonathanMoveInterval = Math.max(1.2, 5.5 - (effectiveLevelJ * 0.2));
+            aMoveInterval = Math.max(1.0, 4.8 - (effectiveLevelA * 0.18));
 
             document.getElementById('screen-menu').classList.add('hidden');
             document.getElementById('modal-night-select').classList.add('hidden');
@@ -535,7 +708,7 @@
             document.getElementById('screen-game').classList.remove('hidden');
             document.getElementById('camera-overlay').classList.add('hidden');
 
-            document.getElementById('ui-night').innerText = isCustomNight ? `CUSTOM NIGHT (AI: ${customAILevel})` : `NIGHT ${currentNight}`;
+            document.getElementById('ui-night').innerText = isCustomNight ? `CUSTOM NIGHT` : `NIGHT ${currentNight}`;
             document.getElementById('ui-time').innerText = "12 AM";
 
             updateDoorButtons();
@@ -557,7 +730,9 @@
         }
 
         function updateGame(dt) {
-            hourTimer += dt;
+            const effectiveDt = modFastTime ? dt * 4 : dt;
+
+            hourTimer += effectiveDt;
             if (hourTimer >= hourDuration) {
                 hourTimer = 0;
                 gameTimeHour++;
@@ -576,15 +751,19 @@
             if (lightRight) usageFactor += 1;
             if (isCamMonitorOpen) usageFactor += 1;
 
-            power -= powerDrainRate * usageFactor * dt * 4.2;
-            if (power <= 0) {
-                power = 0;
-                doorLeft = false;
-                doorRight = false;
-                lightLeft = false;
-                lightRight = false;
-                if (isCamMonitorOpen) toggleCameraMonitor();
-                updateDoorButtons();
+            if (!modInfinitePower) {
+                power -= powerDrainRate * usageFactor * dt * 4.2;
+                if (power <= 0) {
+                    power = 0;
+                    doorLeft = false;
+                    doorRight = false;
+                    lightLeft = false;
+                    lightRight = false;
+                    if (isCamMonitorOpen) toggleCameraMonitor();
+                    updateDoorButtons();
+                }
+            } else {
+                power = 100;
             }
 
             document.getElementById('ui-power').innerText = `${Math.ceil(power)}%`;
@@ -594,27 +773,68 @@
             usageElem.innerText = usageText;
             usageElem.className = `font-bold text-sm ml-1 ${usageFactor > 3 ? 'text-red-500' : (usageFactor > 1 ? 'text-yellow-400' : 'text-emerald-400')}`;
 
-            jonathanMoveTimer += dt;
-            if (jonathanMoveTimer >= jonathanMoveInterval) {
-                jonathanMoveTimer = 0;
-                attemptJonathanMove();
+            if (!modDisableAI) {
+                // Jonathan AI
+                jonathanMoveTimer += dt;
+                if (jonathanMoveTimer >= jonathanMoveInterval) {
+                    jonathanMoveTimer = 0;
+                    attemptJonathanMove();
+                }
+
+                // Character A AI
+                aMoveTimer += dt;
+                if (aMoveTimer >= aMoveInterval) {
+                    aMoveTimer = 0;
+                    attemptAMove();
+                }
             }
 
+            // Check Jonathan Attack Mechanics
             if (jonathanLocation === 6 || jonathanLocation === 7) {
                 jonathanDoorTimer += dt;
                 
                 if (jonathanLocation === 6 && doorLeft) {
                     jonathanLocation = 1;
                     jonathanDoorTimer = 0;
-                }
-                else if (jonathanLocation === 7 && doorRight) {
+                } else if (jonathanLocation === 7 && doorRight) {
                     jonathanLocation = 1;
                     jonathanDoorTimer = 0;
-                }
-                else {
+                } else {
                     const maxDoorTime = isCustomNight ? Math.max(1.8, 4.0 - (customAILevel * 0.1)) : (4.5 - currentNight * 0.4);
                     if (jonathanDoorTimer > maxDoorTime) {
-                        triggerJumpscare();
+                        triggerJumpscare('jonathan');
+                    }
+                }
+            }
+
+            // Check Character A Door / Office Breach Mechanics
+            if (!aInsideOffice) {
+                if (aLocation === 6 || aLocation === 7) {
+                    aDoorTimer += dt;
+
+                    if (aLocation === 6 && doorLeft) {
+                        // Door closed in time, pushed back
+                        aLocation = 1;
+                        aDoorTimer = 0;
+                    } else if (aLocation === 7 && doorRight) {
+                        // Door closed in time, pushed back
+                        aLocation = 1;
+                        aDoorTimer = 0;
+                    } else {
+                        const maxDoorTime = isCustomNight ? Math.max(1.5, 3.5 - (customAIA_Level * 0.1)) : (4.0 - currentNight * 0.3);
+                        if (aDoorTimer > maxDoorTime) {
+                            // Breaches office! Disables corresponding door
+                            aInsideOffice = true;
+                            playLaughSound();
+                            if (aLocation === 6) {
+                                doorsDisabledLeft = true;
+                                doorLeft = false;
+                            } else if (aLocation === 7) {
+                                doorsDisabledRight = true;
+                                doorRight = false;
+                            }
+                            updateDoorButtons();
+                        }
                     }
                 }
             }
@@ -642,6 +862,39 @@
                 case 5:
                     jonathanLocation = 7;
                     jonathanDoorTimer = 0;
+                    break;
+            }
+        }
+
+        function attemptAMove() {
+            if (aInsideOffice) return; // already inside
+
+            const level = isCustomNight ? customAIA_Level : (currentNight * 3);
+            const chance = 0.25 + (level * 0.035);
+            if (Math.random() > chance) return;
+
+            switch (aLocation) {
+                case 1:
+                    aLocation = Math.random() < 0.5 ? 2 : 3;
+                    playLaughSound();
+                    break;
+                case 2:
+                    aLocation = 4;
+                    playLaughSound();
+                    break;
+                case 3:
+                    aLocation = 5;
+                    playLaughSound();
+                    break;
+                case 4:
+                    aLocation = 6;
+                    aDoorTimer = 0;
+                    playLaughSound();
+                    break;
+                case 5:
+                    aLocation = 7;
+                    aDoorTimer = 0;
+                    playLaughSound();
                     break;
             }
         }
@@ -708,6 +961,9 @@
                 if (jonathanLocation === 6) {
                     drawJonathanSprite(officeCtx, w * 0.12, h * 0.44, 170, 210, 1.4);
                 }
+                if (aLocation === 6 && !aInsideOffice) {
+                    drawASprite(officeCtx, w * 0.12, h * 0.44, 130, 150);
+                }
             }
 
             if (lightRight && !doorRight) {
@@ -720,6 +976,14 @@
                 if (jonathanLocation === 7) {
                     drawJonathanSprite(officeCtx, w * 0.88, h * 0.44, 170, 210, 1.4);
                 }
+                if (aLocation === 7 && !aInsideOffice) {
+                    drawASprite(officeCtx, w * 0.88, h * 0.44, 130, 150);
+                }
+            }
+
+            // Render Character A if he breached inside office
+            if (aInsideOffice) {
+                drawASprite(officeCtx, w * 0.5, h * 0.6, 140, 160);
             }
         }
 
@@ -741,7 +1005,10 @@
                     cameraCtx.fillText("CRUMMY GAINZ STAGE", w * 0.35, h * 0.18);
 
                     if (jonathanLocation === 1) {
-                        drawJonathanSprite(cameraCtx, w * 0.5, h * 0.48, 180, 220, 1.45);
+                        drawJonathanSprite(cameraCtx, w * 0.4, h * 0.48, 180, 220, 1.45);
+                    }
+                    if (aLocation === 1 && !aInsideOffice) {
+                        drawASprite(cameraCtx, w * 0.65, h * 0.48, 130, 150);
                     }
                     break;
 
@@ -755,7 +1022,10 @@
                     cameraCtx.fillText("TREADMILL ZONE", w * 0.38, h * 0.16);
 
                     if (jonathanLocation === 2) {
-                        drawJonathanSprite(cameraCtx, w * 0.43, h * 0.5, 170, 210, 1.4);
+                        drawJonathanSprite(cameraCtx, w * 0.35, h * 0.5, 170, 210, 1.4);
+                    }
+                    if (aLocation === 2 && !aInsideOffice) {
+                        drawASprite(cameraCtx, w * 0.65, h * 0.5, 130, 150);
                     }
                     break;
 
@@ -769,7 +1039,10 @@
                     cameraCtx.fillText("LOCKER ROOM", w * 0.4, h * 0.16);
 
                     if (jonathanLocation === 3) {
-                        drawJonathanSprite(cameraCtx, w * 0.45, h * 0.52, 170, 210, 1.4);
+                        drawJonathanSprite(cameraCtx, w * 0.35, h * 0.52, 170, 210, 1.4);
+                    }
+                    if (aLocation === 3 && !aInsideOffice) {
+                        drawASprite(cameraCtx, w * 0.65, h * 0.52, 130, 150);
                     }
                     break;
 
@@ -781,7 +1054,10 @@
                     cameraCtx.fillText("LEFT HALLWAY", w * 0.38, h * 0.16);
 
                     if (jonathanLocation === 4 || jonathanLocation === 6) {
-                        drawJonathanSprite(cameraCtx, w * 0.55, h * 0.5, 170, 210, 1.4);
+                        drawJonathanSprite(cameraCtx, w * 0.45, h * 0.5, 170, 210, 1.4);
+                    }
+                    if ((aLocation === 4 || aLocation === 6) && !aInsideOffice) {
+                        drawASprite(cameraCtx, w * 0.25, h * 0.5, 130, 150);
                     }
                     break;
 
@@ -793,23 +1069,37 @@
                     cameraCtx.fillText("RIGHT HALLWAY", w * 0.38, h * 0.16);
 
                     if (jonathanLocation === 5 || jonathanLocation === 7) {
-                        drawJonathanSprite(cameraCtx, w * 0.45, h * 0.5, 170, 210, 1.4);
+                        drawJonathanSprite(cameraCtx, w * 0.55, h * 0.5, 170, 210, 1.4);
+                    }
+                    if ((aLocation === 5 || aLocation === 7) && !aInsideOffice) {
+                        drawASprite(cameraCtx, w * 0.75, h * 0.5, 130, 150);
                     }
                     break;
             }
         }
 
-        function triggerJumpscare() {
+        function triggerJumpscare(byWho = 'jonathan') {
             isGameOver = true;
+            killedBy = byWho;
+
             document.getElementById('screen-game').classList.add('hidden');
             document.getElementById('screen-gameover').classList.remove('hidden');
+
+            const sub = document.getElementById('death-subtitle');
+            if (sub) {
+                sub.innerText = byWho === 'jonathan' ? 'Jonathan got you!' : 'Character A got you!';
+            }
 
             jumpscareAudio.currentTime = 0;
             jumpscareAudio.play().catch(e => console.log('Jumpscare audio error:', e));
 
             if (jumpscareCtx) {
                 jumpscareCtx.clearRect(0, 0, 400, 400);
-                drawJonathanSprite(jumpscareCtx, 200, 200, 260, 300, 1.8);
+                if (byWho === 'jonathan') {
+                    drawJonathanSprite(jumpscareCtx, 200, 200, 260, 300, 1.8);
+                } else {
+                    drawASprite(jumpscareCtx, 200, 200, 220, 250);
+                }
             }
 
             setTimeout(() => {
@@ -823,11 +1113,6 @@
             document.getElementById('screen-game').classList.add('hidden');
             document.getElementById('screen-win').classList.remove('hidden');
             document.getElementById('win-night-subtext').innerText = `You survived Night ${currentNight} at Jonathan's Gym`;
-            
-            if (currentNight >= 5) {
-                unlockedCustomNight = true;
-                document.getElementById('btn-custom-night-menu').classList.remove('hidden');
-            }
         }
     </script>
 </body>
