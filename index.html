@@ -104,27 +104,68 @@
 
         <!-- MOD MENU MODAL -->
         <div id="modal-mod-menu" class="hidden absolute inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-            <div class="bg-neutral-900 border-2 border-purple-600 rounded-lg p-6 max-w-sm w-full text-left space-y-4 shadow-2xl text-purple-300">
+            <div class="bg-neutral-900 border-2 border-purple-600 rounded-lg p-5 max-w-sm w-full max-h-[92%] overflow-y-auto text-left space-y-3 shadow-2xl text-purple-300">
                 <h3 class="text-2xl font-bold text-purple-400 border-b border-purple-800 pb-2 flex justify-between items-center">
                     <span><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>MOD MENU</span>
                     <button id="btn-close-mod-menu" class="text-neutral-400 hover:text-white text-lg">&times;</button>
                 </h3>
                 
-                <div class="space-y-3 text-sm">
-                    <label class="flex items-center justify-between bg-neutral-950 p-2 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                <div class="space-y-2 text-sm">
+                    <p class="text-[10px] leading-snug text-purple-400/80 bg-purple-950/40 border border-purple-900 rounded p-2">
+                        Using any mod marks the night as <b>MODDED</b>: no trophy, and clearing all 5 nights with mods gets you fired.
+                    </p>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
                         <span>Infinite Power</span>
                         <input type="checkbox" id="mod-infinite-power" class="accent-purple-500 w-4 h-4">
                     </label>
-
-                    <label class="flex items-center justify-between bg-neutral-950 p-2 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
-                        <span>Disable Anim AI</span>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Disable Anim AI (both)</span>
                         <input type="checkbox" id="mod-disable-ai" class="accent-purple-500 w-4 h-4">
                     </label>
-
-                    <label class="flex items-center justify-between bg-neutral-950 p-2 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Freeze Jonathan</span>
+                        <input type="checkbox" id="mod-freeze-j" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Freeze Character A</span>
+                        <input type="checkbox" id="mod-freeze-a" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
                         <span>Fast Shift Time</span>
                         <input type="checkbox" id="mod-fast-time" class="accent-purple-500 w-4 h-4">
                     </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Freeze Clock</span>
+                        <input type="checkbox" id="mod-freeze-clock" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Invincible (no jumpscares)</span>
+                        <input type="checkbox" id="mod-invincible" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>A Can't Lock Doors</span>
+                        <input type="checkbox" id="mod-no-door-lock" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Free Doors &amp; Lights</span>
+                        <input type="checkbox" id="mod-free-usage" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Show Animatronic Locations</span>
+                        <input type="checkbox" id="mod-show-locs" class="accent-purple-500 w-4 h-4">
+                    </label>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button id="mod-refill-power" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-bolt mr-1"></i>Refill Power</button>
+                        <button id="mod-skip-hour" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-forward mr-1"></i>+1 Hour</button>
+                        <button id="mod-reset-j" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-house mr-1"></i>Jonathan Home</button>
+                        <button id="mod-reset-a" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-house mr-1"></i>A Home</button>
+                    </div>
+                    <div class="text-[10px] uppercase tracking-widest text-purple-500 pt-1 border-t border-purple-900">Preview / Save</div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="mod-preview-pay" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-money-check-dollar mr-1"></i>Paycheck</button>
+                        <button id="mod-preview-fired" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-user-slash mr-1"></i>Fired</button>
+                        <button id="mod-reset-save" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-trash mr-1"></i>Reset Save</button>
+                    </div>
 
                     <button id="mod-instant-win" class="w-full py-2 bg-purple-900 hover:bg-purple-800 text-purple-100 font-bold rounded border border-purple-600 transition uppercase text-xs">
                         <i class="fa-solid fa-trophy mr-1"></i> Skip Night (Instant Win)
@@ -345,7 +386,8 @@
             <h2 class="text-7xl font-crt font-bold text-yellow-400 animate-bounce mb-2">5:59 AM</h2>
             <h1 class="text-9xl font-crt font-extrabold text-white tracking-widest drop-shadow-[0_0_25px_rgba(255,255,255,0.9)] my-4">6:00 AM</h1>
             <p class="text-xl text-emerald-400 font-bold uppercase tracking-widest mt-2">SHIFT COMPLETED!</p>
-            <p id="win-night-subtext" class="text-sm text-neutral-400 mb-8">You survived Night 1 at Jonathan's Gym</p>
+            <p id="win-night-subtext" class="text-sm text-neutral-400 mb-2">You survived Night 1 at Jonathan's Gym</p>
+            <p id="win-extra" class="text-sm text-yellow-300 mb-6 min-h-[1.25rem] max-w-md"></p>
             <button id="btn-next-night" class="px-8 py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg border border-emerald-400 transition text-lg shadow-lg">
                 CONTINUE
             </button>
@@ -370,6 +412,15 @@
                     TRY AGAIN
                 </button>
             </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 8. ENDING (PAYCHECK / FIRED)               -->
+        <!-- ========================================== -->
+        <div id="screen-ending" class="hidden absolute inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-6 gap-5 text-center overflow-y-auto">
+            <p id="ending-headline" class="text-sm uppercase tracking-widest font-bold"></p>
+            <div id="ending-paper" class="relative"></div>
+            <button id="btn-ending-menu" class="px-8 py-3 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded-lg border border-neutral-500 transition">BACK TO MENU</button>
         </div>
 
     </div>
@@ -443,6 +494,24 @@
         let modInfinitePower = false;
         let modDisableAI = false;
         let modFastTime = false;
+        let modFreezeJ = false, modFreezeA = false, modFreezeClock = false;
+        let modInvincible = false, modNoDoorLock = false, modFreeUsage = false, modShowLocs = false;
+        let nightModded = false;      // true if any mod was active at any point this night
+        let pendingEnding = null;     // 'paycheck' | 'fired' | null
+
+        function anyModActive() {
+            return modInfinitePower || modDisableAI || modFastTime || modFreezeJ || modFreezeA ||
+                   modFreezeClock || modInvincible || modNoDoorLock || modFreeUsage;
+        }
+
+        // Save data (stored in the browser): trophy + latest result of each night ('clean' | 'modded')
+        const SAVE_KEY = 'five_crummy_nights_save_v1';
+        let save = { trophy: false, cleared: {} };
+        try {
+            const raw = JSON.parse(localStorage.getItem(SAVE_KEY));
+            if (raw) save = Object.assign(save, raw);
+        } catch (e) {}
+        function writeSave() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
 
         let gameTimeHour = 0; 
         let hourDuration = 22; 
@@ -603,7 +672,42 @@
         });
         document.getElementById('mod-instant-win').addEventListener('click', () => {
             document.getElementById('modal-mod-menu').classList.add('hidden');
-            if (!isGameOver) winNight();
+            if (!isGameOver && !isWin) { nightModded = true; winNight(); }
+        });
+
+        const modBinds = {
+            'mod-freeze-j': v => modFreezeJ = v,
+            'mod-freeze-a': v => modFreezeA = v,
+            'mod-freeze-clock': v => modFreezeClock = v,
+            'mod-invincible': v => modInvincible = v,
+            'mod-no-door-lock': v => modNoDoorLock = v,
+            'mod-free-usage': v => modFreeUsage = v,
+            'mod-show-locs': v => modShowLocs = v
+        };
+        Object.entries(modBinds).forEach(([id, fn]) =>
+            document.getElementById(id).addEventListener('change', e => fn(e.target.checked)));
+
+        function advanceHour() {
+            hourTimer = 0;
+            gameTimeHour++;
+            if (gameTimeHour >= 6) { winNight(); return; }
+            document.getElementById('ui-time').innerText = gameTimeHour === 0 ? '12 AM' : `${gameTimeHour} AM`;
+        }
+        document.getElementById('mod-refill-power').addEventListener('click', () => { power = 100; nightModded = true; });
+        document.getElementById('mod-skip-hour').addEventListener('click', () => {
+            if (isGameOver || isWin) return;
+            nightModded = true; advanceHour();
+        });
+        document.getElementById('mod-reset-j').addEventListener('click', () => { jonathanLocation = 1; jonathanDoorTimer = 0; nightModded = true; });
+        document.getElementById('mod-reset-a').addEventListener('click', () => { aLocation = 1; aDoorTimer = 0; aInsideOffice = false; aBreachSide = null; nightModded = true; });
+        document.getElementById('mod-preview-pay').addEventListener('click', () => showEnding('paycheck'));
+        document.getElementById('mod-preview-fired').addEventListener('click', () => showEnding('fired'));
+        document.getElementById('mod-reset-save').addEventListener('click', () => {
+            if (confirm('Reset trophy and night progress?')) { save = { trophy: false, cleared: {} }; writeSave(); }
+        });
+        document.getElementById('btn-ending-menu').addEventListener('click', () => {
+            document.getElementById('screen-ending').classList.add('hidden');
+            document.getElementById('screen-menu').classList.remove('hidden');
         });
 
         // Main Interface Event Listeners
@@ -624,7 +728,11 @@
         document.getElementById('btn-toggle-cam').addEventListener('click', toggleCameraMonitor);
         document.getElementById('btn-retry').addEventListener('click', () => startGame(currentNight, isCustomNight));
         document.getElementById('btn-next-night').addEventListener('click', () => {
-            if (currentNight < 5) startGame(currentNight + 1, false);
+            if (pendingEnding) {
+                const type = pendingEnding;
+                pendingEnding = null;
+                showEnding(type);
+            } else if (currentNight < 5) startGame(currentNight + 1, false);
             else {
                 document.getElementById('screen-win').classList.add('hidden');
                 document.getElementById('screen-menu').classList.remove('hidden');
@@ -719,6 +827,8 @@
             power = 100.0;
             isGameOver = false;
             isWin = false;
+            nightModded = false;
+            pendingEnding = null;
 
             doorLeft = false;
             doorRight = false;
@@ -749,6 +859,7 @@
             document.getElementById('modal-instructions').classList.add('hidden');
             document.getElementById('screen-win').classList.add('hidden');
             document.getElementById('screen-gameover').classList.add('hidden');
+            document.getElementById('screen-ending').classList.add('hidden');
             document.getElementById('screen-game').classList.remove('hidden');
             document.getElementById('camera-overlay').classList.add('hidden');
 
@@ -763,8 +874,12 @@
 
         function updateGame(dt) {
             const effectiveDt = modFastTime ? dt * 4 : dt;
+            if (anyModActive()) nightModded = true;
+            if (modNoDoorLock && (doorsDisabledLeftTimer > 0 || doorsDisabledRightTimer > 0)) {
+                doorsDisabledLeftTimer = 0; doorsDisabledRightTimer = 0; updateDoorButtons();
+            }
 
-            hourTimer += effectiveDt;
+            if (!modFreezeClock) hourTimer += effectiveDt;
             if (hourTimer >= hourDuration) {
                 hourTimer = 0;
                 gameTimeHour++;
@@ -792,10 +907,12 @@
             }
 
             let usageFactor = 1;
-            if (doorLeft) usageFactor += 1;
-            if (doorRight) usageFactor += 1;
-            if (lightLeft) usageFactor += 1;
-            if (lightRight) usageFactor += 1;
+            if (!modFreeUsage) {
+                if (doorLeft) usageFactor += 1;
+                if (doorRight) usageFactor += 1;
+                if (lightLeft) usageFactor += 1;
+                if (lightRight) usageFactor += 1;
+            }
             if (isCamMonitorOpen) usageFactor += 1;
 
             if (!modInfinitePower) {
@@ -820,13 +937,16 @@
             usageElem.innerText = usageText;
             usageElem.className = `font-bold text-sm ml-1 ${usageFactor > 3 ? 'text-red-500' : (usageFactor > 1 ? 'text-yellow-400' : 'text-emerald-400')}`;
 
-            if (!modDisableAI) {
+            const frozenJ = modDisableAI || modFreezeJ;
+            const frozenA = modDisableAI || modFreezeA;
+            if (!frozenJ) {
                 jonathanMoveTimer += dt;
                 if (jonathanMoveTimer >= jonathanMoveInterval) {
                     jonathanMoveTimer = 0;
                     attemptJonathanMove();
                 }
-
+            }
+            if (!frozenA) {
                 aMoveTimer += dt;
                 if (aMoveTimer >= aMoveInterval) {
                     aMoveTimer = 0;
@@ -834,7 +954,7 @@
                 }
             }
 
-            if (jonathanLocation === 6 || jonathanLocation === 7) {
+            if (!frozenJ && (jonathanLocation === 6 || jonathanLocation === 7)) {
                 jonathanDoorTimer += dt;
                 
                 if (jonathanLocation === 6 && doorLeft) {
@@ -852,7 +972,7 @@
             }
 
             if (!aInsideOffice) {
-                if (aLocation === 6 || aLocation === 7) {
+                if (!frozenA && (aLocation === 6 || aLocation === 7)) {
                     aDoorTimer += dt;
 
                     if (aLocation === 6 && doorLeft) {
@@ -1281,6 +1401,7 @@
             ctx.fillStyle = '#0e7490'; ctx.fillRect(w * 0.67, h * 0.7 - 36, 14, 36);                    // bottle
             ctx.fillStyle = '#e5e7eb'; ctx.fillRect(w * 0.67 + 3, h * 0.7 - 42, 8, 6);
             ctx.fillStyle = '#e5e7eb'; ctx.fillRect(w * 0.6, h * 0.7 - 6, 40, 6);                       // papers
+            if (save.trophy) drawAguacateTrophy(ctx, w * 0.715, h * 0.7);                              // aguacate trophy
             ctx.fillStyle = '#7f1d1d'; ctx.fillRect(w * 0.37, h * 0.7 - 16, 16, 16);                    // mug
             ctx.fillStyle = '#1c1917'; ctx.fillRect(w * 0.37 + 2, h * 0.7 - 14, 12, 3);
 
@@ -1303,11 +1424,95 @@
             door(w * 0.76, doorRight);
         }
 
+        function debugLocs(ctx, w, h) {
+            if (!modShowLocs || !ctx) return;
+            const N = { 1: 'Stage', 2: 'Treadmills', 3: 'Lockers', 4: 'Left Hall', 5: 'Right Hall', 6: 'Left Door', 7: 'Right Door' };
+            ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(12, h - 70, 200, 52);
+            ctx.fillStyle = '#c084fc'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'left';
+            ctx.fillText('JONATHAN: ' + N[jonathanLocation], 20, h - 48);
+            ctx.fillText('A: ' + (aInsideOffice ? 'IN OFFICE' : N[aLocation]), 20, h - 28);
+        }
+
         function renderGame() {
             renderOffice();
+            debugLocs(officeCtx, officeCanvas.width, officeCanvas.height);
             if (isCamMonitorOpen) {
                 renderCameraFeed();
+                debugLocs(cameraCtx, cameraCanvas.width, cameraCanvas.height);
             }
+        }
+
+        // Golden aguacate trophy (unlocked by beating the 2/20 custom night without mods)
+        function drawAguacateTrophy(ctx, x, y) {
+            const t = performance.now() / 1000;
+            ctx.save(); ctx.translate(x, y);
+            const glow = ctx.createRadialGradient(0, -34, 4, 0, -34, 60);
+            glow.addColorStop(0, 'rgba(250,204,21,0.22)'); glow.addColorStop(1, 'rgba(250,204,21,0)');
+            ctx.fillStyle = glow; ctx.fillRect(-60, -94, 120, 120);
+            ctx.fillStyle = '#1a1a1f'; ctx.fillRect(-18, -8, 36, 8);                       // plinth
+            ctx.fillStyle = '#ca8a04'; ctx.fillRect(-18, -8, 36, 2);
+            ctx.fillStyle = '#fde68a'; ctx.fillRect(-8, -5, 16, 2);                        // plaque
+            const g = ctx.createLinearGradient(-18, -64, 18, -12);
+            g.addColorStop(0, '#fef08a'); g.addColorStop(0.5, '#eab308'); g.addColorStop(1, '#a16207');
+            ctx.fillStyle = g; ctx.beginPath();                                            // avocado body
+            ctx.moveTo(0, -64); ctx.bezierCurveTo(10, -64, 12, -50, 18, -40);
+            ctx.bezierCurveTo(24, -28, 16, -12, 0, -12); ctx.bezierCurveTo(-16, -12, -24, -28, -18, -40);
+            ctx.bezierCurveTo(-12, -50, -10, -64, 0, -64); ctx.fill();
+            ctx.fillStyle = '#92400e'; ctx.beginPath(); ctx.arc(0, -27, 8, 0, 7); ctx.fill();   // pit
+            ctx.fillStyle = '#b45309'; ctx.beginPath(); ctx.arc(-2, -29, 3, 0, 7); ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.beginPath(); ctx.ellipse(-8, -42, 3, 8, -0.3, 0, 7); ctx.fill();
+            const sp = 0.5 + 0.5 * Math.sin(t * 3);                                         // sparkle
+            ctx.strokeStyle = `rgba(255,255,255,${0.35 + 0.65 * sp})`; ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(15, -58 - 5 * sp); ctx.lineTo(15, -58 + 5 * sp); ctx.moveTo(15 - 5 * sp, -58); ctx.lineTo(15 + 5 * sp, -58); ctx.stroke();
+            ctx.restore();
+        }
+
+        // Ending screens (paycheck / fired)
+        function showEnding(type) {
+            isWin = true;   // stops the game loop
+            document.getElementById('modal-mod-menu').classList.add('hidden');
+            ['screen-game', 'screen-win', 'screen-gameover'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            const paper = document.getElementById('ending-paper');
+            const head = document.getElementById('ending-headline');
+            if (type === 'paycheck') {
+                head.className = 'text-sm uppercase tracking-widest font-bold text-emerald-400';
+                head.innerText = 'You survived all 5 nights!';
+                paper.className = 'relative w-full max-w-xl bg-amber-50 text-neutral-900 rounded shadow-2xl border-4 border-emerald-700 p-6 text-left';
+                paper.innerHTML = `
+                    <div class="flex justify-between items-start border-b-2 border-emerald-800 pb-2 mb-4">
+                        <div><div class="font-extrabold text-emerald-800 tracking-widest text-lg">JONATHAN'S GYM</div>
+                        <div class="text-[10px] uppercase tracking-widest text-neutral-500">Payroll Dept. &middot; Gainz Federal Credit Union</div></div>
+                        <div class="text-right text-xs text-neutral-500">CHECK No. 0005<br>DATE: 6:00 AM</div>
+                    </div>
+                    <div class="flex items-end gap-2 mb-3">
+                        <span class="text-[10px] uppercase text-neutral-500 w-16 leading-tight">Pay to the order of</span>
+                        <span class="flex-1 border-b border-neutral-400 text-2xl font-bold italic px-2" style="font-family:'Brush Script MT',cursive">Hugh Jazzman</span>
+                        <span class="border-2 border-neutral-700 px-3 py-1 font-bold text-xl">$1,250.00</span>
+                    </div>
+                    <div class="text-sm border-b border-neutral-400 pb-1 mb-5 italic">One thousand two hundred fifty and 00/100 dollars</div>
+                    <div class="flex justify-between items-end">
+                        <div class="text-xs text-neutral-500">MEMO: 5 nights of overnight security</div>
+                        <div class="text-center"><div class="italic text-2xl" style="font-family:'Brush Script MT',cursive">Jonathan</div>
+                        <div class="border-t border-neutral-500 text-[10px] uppercase text-neutral-500 px-6">Authorized signature</div></div>
+                    </div>`;
+            } else {
+                head.className = 'text-sm uppercase tracking-widest font-bold text-red-400';
+                head.innerText = '5 nights cleared... with mods.';
+                paper.className = 'relative w-full max-w-xl bg-neutral-100 text-neutral-900 rounded shadow-2xl border-4 border-red-700 p-6 text-left';
+                paper.innerHTML = `
+                    <div class="text-center border-b-2 border-red-700 pb-2 mb-4">
+                        <div class="font-extrabold text-red-700 tracking-widest text-2xl">NOTICE OF TERMINATION</div>
+                        <div class="text-[10px] uppercase tracking-widest text-neutral-500">Jonathan's Gym &middot; Human Resources</div>
+                    </div>
+                    <p class="text-sm mb-2"><b>To:</b> George Anthony</p>
+                    <p class="text-sm mb-2">Effective immediately, your employment as Night Security Guard is terminated.</p>
+                    <p class="text-sm mb-2"><b>Reason:</b> Tampering with the gym's security systems. Our logs show modifications you were not authorized to make.</p>
+                    <p class="text-sm mb-5"><b>Final paycheck:</b> $0.00</p>
+                    <div class="text-right"><div class="italic text-2xl" style="font-family:'Brush Script MT',cursive">Jonathan</div>
+                    <div class="text-[10px] uppercase text-neutral-500">Owner &amp; Head Trainer</div></div>
+                    <div class="absolute top-16 right-6 border-4 border-red-600 text-red-600 font-extrabold text-3xl px-3 py-1 tracking-widest opacity-70" style="transform:rotate(-14deg)">VOID</div>`;
+            }
+            document.getElementById('screen-ending').classList.remove('hidden');
         }
 
         function renderOffice() {
@@ -1388,6 +1593,7 @@
         }
 
         function triggerJumpscare(byWho = 'jonathan') {
+            if (modInvincible) return;
             isGameOver = true;
             killedBy = byWho;
 
@@ -1419,9 +1625,39 @@
 
         function winNight() {
             isWin = true;
+            const modded = nightModded || anyModActive();
             document.getElementById('screen-game').classList.add('hidden');
             document.getElementById('screen-win').classList.remove('hidden');
-            document.getElementById('win-night-subtext').innerText = `You survived Night ${currentNight} at Jonathan's Gym`;
+            document.getElementById('win-night-subtext').innerText = isCustomNight
+                ? "You survived the Custom Night at Jonathan's Gym"
+                : `You survived Night ${currentNight} at Jonathan's Gym`;
+
+            let msg = '';
+            pendingEnding = null;
+            if (isCustomNight) {
+                if (customAILevel === 20 && customAIA_Level === 20) {   // the "2/20" challenge
+                    if (modded) {
+                        msg = '2/20 cleared with mods. Cheaters don\'t get trophies.';
+                    } else if (!save.trophy) {
+                        save.trophy = true; writeSave();
+                        msg = '\u{1F951} GOLDEN AGUACATE TROPHY UNLOCKED! It now sits on your desk.';
+                    } else {
+                        msg = '\u{1F951} 2/20 cleared again! Your trophy stays on the desk.';
+                    }
+                }
+            } else {
+                save.cleared[currentNight] = modded ? 'modded' : 'clean';
+                writeSave();
+                const done = [1, 2, 3, 4, 5].filter(n => save.cleared[n]);
+                if (currentNight === 5 && done.length === 5) {
+                    pendingEnding = [1, 2, 3, 4, 5].some(n => save.cleared[n] === 'modded') ? 'fired' : 'paycheck';
+                    msg = 'All 5 nights cleared. Jonathan wants a word...';
+                } else {
+                    msg = `Nights cleared: ${done.length}/5. Clear all 5 to collect your paycheck.`;
+                }
+                if (modded) msg += ' (This night was cleared with mods.)';
+            }
+            document.getElementById('win-extra').innerText = msg;
         }
     </script>
 </body>
