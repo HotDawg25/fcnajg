@@ -154,11 +154,20 @@
                         <span>Show Animatronic Locations</span>
                         <input type="checkbox" id="mod-show-locs" class="accent-purple-500 w-4 h-4">
                     </label>
+                    <label class="flex items-center justify-between bg-neutral-950 px-2 py-1.5 rounded border border-neutral-800 cursor-pointer hover:bg-neutral-900">
+                        <span>Disable Aguacates</span>
+                        <input type="checkbox" id="mod-no-agua" class="accent-purple-500 w-4 h-4">
+                    </label>
                     <div class="grid grid-cols-2 gap-2 pt-1">
                         <button id="mod-refill-power" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-bolt mr-1"></i>Refill Power</button>
                         <button id="mod-skip-hour" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-forward mr-1"></i>+1 Hour</button>
                         <button id="mod-reset-j" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-house mr-1"></i>Jonathan Home</button>
                         <button id="mod-reset-a" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-house mr-1"></i>A Home</button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="mod-spawn-agua" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-seedling mr-1"></i>Spawn Mini</button>
+                        <button id="mod-clear-agua" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-broom mr-1"></i>Clear Minis</button>
+                        <button id="mod-preview-mega" class="py-1.5 bg-purple-950 hover:bg-purple-900 text-purple-200 font-bold rounded border border-purple-700 transition text-[11px] uppercase"><i class="fa-solid fa-fire mr-1"></i>Mega Scare</button>
                     </div>
                     <div class="text-[10px] uppercase tracking-widest text-purple-500 pt-1 border-t border-purple-900">Preview / Save</div>
                     <div class="grid grid-cols-3 gap-2">
@@ -259,6 +268,15 @@
                             <button onclick="adjustCustomAI('a', 1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">+</button>
                         </div>
                     </div>
+
+                    <div class="col-span-2 p-3 bg-neutral-950 border border-neutral-800 rounded-lg flex flex-col items-center justify-center space-y-2">
+                        <span class="text-xs font-bold text-lime-400 uppercase tracking-wide">AGUACATES</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="adjustCustomAI('ag', -1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">-</button>
+                            <span id="custom-ai-ag-val" class="text-2xl font-crt font-bold text-lime-400 w-10 text-center">20</span>
+                            <button onclick="adjustCustomAI('ag', 1)" class="w-8 h-8 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded border border-neutral-600">+</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex gap-3">
@@ -281,6 +299,7 @@
                     <p><strong class="text-yellow-400">OBJECTIVE:</strong> Survive 12 AM to 6 AM against Jonathan & Character A.</p>
                     <p><strong class="text-yellow-400">MONITOR (CAMERAS):</strong> Open cameras (CAM 1-5) to locate Jonathan and Character A. Character A laughs when nearby.</p>
                     <p><strong class="text-cyan-400">CHARACTER A:</strong> Roams cameras and approaches doors. If he reaches your doorway and you aren't fast enough to close it, he breaches the office and permanently disables doors! Close doors preemptively to stop him.</p>
+                    <p><strong class="text-lime-400">AGUACATES:</strong> Little aguacates sprout around the office. Hover your mouse over one for a moment to squash it. Let 7 pile up and the MEGA AGUACATE comes for you. You'll hear a pop whenever a new one appears, even while the monitor is up.</p>
                     <p><strong class="text-yellow-400">DOORS & LIGHTS:</strong> Toggle left/right door lights to check hall blindspots. Close doors if Jonathan or A is at your entrance!</p>
                 </div>
                 <div class="text-center pt-2">
@@ -396,14 +415,16 @@
         <!-- ========================================== -->
         <!-- 7. GAME OVER / JUMPSCARE & DEATH SEQUENCE  -->
         <!-- ========================================== -->
-        <div id="screen-gameover" class="hidden absolute inset-0 z-50 bg-black flex flex-col items-center justify-center text-center p-6 overflow-hidden">
-            <!-- Jumpscare Shaking Canvas Container -->
-            <div id="jumpscare-container" class="relative w-full h-80 flex items-center justify-center z-10">
+        <div id="screen-gameover" class="hidden absolute inset-0 z-50 bg-black overflow-hidden">
+            <!-- 1) the actual jumpscare -->
+            <div id="jumpscare-container" class="absolute inset-0 flex items-center justify-center z-10 overflow-hidden">
                 <canvas id="jumpscare-canvas" width="400" height="400" class="jumpscare-anim pointer-events-none"></canvas>
             </div>
-
-            <!-- "YOU DIED" HUD LAYER -->
-            <div id="death-text-hud" class="relative z-30 flex flex-col items-center justify-center space-y-4 mt-4">
+            <!-- 2) fades to red, 3) then to black -->
+            <div id="death-red" class="absolute inset-0 z-20 pointer-events-none" style="background:#b91c1c;opacity:0"></div>
+            <div id="death-black" class="absolute inset-0 z-20 pointer-events-none" style="background:#000;opacity:0"></div>
+            <!-- 4) YOU DIED + voiceline + restart -->
+            <div id="death-text-hud" class="absolute inset-0 z-30 flex flex-col items-center justify-center space-y-4 text-center p-6" style="opacity:0;pointer-events:none">
                 <h1 id="death-title" class="text-6xl sm:text-7xl font-crt font-bold text-red-600 tracking-widest uppercase drop-shadow-[0_0_20px_rgba(220,38,38,1)] animate-pulse">
                     YOU DIED
                 </h1>
@@ -435,9 +456,35 @@
         aImg.src = 'A.png';
 
         // Audio Effects
-        const jumpscareAudio = new Audio('jonothan jumpscare.mp3');
-        const voicelineAudio = new Audio('jonathan voiceline.wav');
-        const laughAudio = new Audio('A laugh.mp3');
+        // makeAudio tries the given name, then underscore / space / lowercase variants if the file isn't found
+        function makeAudio(name) {
+            const variants = [];
+            [name, name.toLowerCase()].forEach(n => [n, n.replace(/ /g, '_'), n.replace(/_/g, ' ')].forEach(v => {
+                if (!variants.includes(v)) variants.push(v);
+            }));
+            const au = new Audio();
+            let i = 0;
+            au.addEventListener('error', () => { if (++i < variants.length) { au.src = variants[i]; au.load(); } });
+            au.src = variants[0];
+            return au;
+        }
+        const jumpscareAudio = makeAudio('jonothan jumpscare.mp3');
+        const voicelineAudio = makeAudio('jonathan voiceline.wav');
+        const laughAudio = makeAudio('A laugh.mp3');
+        const aguacateScream = makeAudio('aguacate_screaming.mp3');   // mega aguacate jumpscare noise
+        const aguacateVoice = makeAudio('Aguacate_voiceline.wav');    // mega aguacate voiceline (on the YOU DIED text)
+
+        // tiny synth blips for aguacate sounds (no files needed)
+        function blip(f1, f2, dur, type, vol) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = audioCtx.currentTime;
+                o.type = type; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+                g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+                o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + dur);
+            } catch (e) {}
+        }
         
         // Audio Context for synthetic fallback
         let audioCtx = null;
@@ -496,12 +543,24 @@
         let modFastTime = false;
         let modFreezeJ = false, modFreezeA = false, modFreezeClock = false;
         let modInvincible = false, modNoDoorLock = false, modFreeUsage = false, modShowLocs = false;
+        let modNoAguacate = false;
         let nightModded = false;      // true if any mod was active at any point this night
+
+        // Aguacates: mini ones pile up in the office; 7 summons the MEGA aguacate
+        const MINI_SLOTS = [[0.60, 0.50], [0.66, 0.50], [0.28, 0.70], [0.41, 0.70], [0.595, 0.70], [0.14, 0.88], [0.86, 0.88]];
+        const AGUA_LEVELS = [2, 5, 8, 12, 16];          // aguacate level for nights 1-5
+        const MINI_HOVER_TIME = 0.8;                    // seconds of hovering to squash one
+        const MEGA_SUMMON_TIME = 1.6;                   // seconds between the 7th mini and the jumpscare
+        let customAguacateLevel = 20;
+        let aguacateLevel = 0, aguaNext = 10, aguaInterval = 20;
+        let minis = [], aguaBursts = [], megaSummonT = 0;
+        let pointer = { x: -999, y: -999 };
+        let deathTimers = [], jsRaf = null;
         let pendingEnding = null;     // 'paycheck' | 'fired' | null
 
         function anyModActive() {
             return modInfinitePower || modDisableAI || modFastTime || modFreezeJ || modFreezeA ||
-                   modFreezeClock || modInvincible || modNoDoorLock || modFreeUsage;
+                   modFreezeClock || modInvincible || modNoDoorLock || modFreeUsage || modNoAguacate;
         }
 
         // Save data (stored in the browser): trophy + latest result of each night ('clean' | 'modded')
@@ -682,7 +741,8 @@
             'mod-invincible': v => modInvincible = v,
             'mod-no-door-lock': v => modNoDoorLock = v,
             'mod-free-usage': v => modFreeUsage = v,
-            'mod-show-locs': v => modShowLocs = v
+            'mod-show-locs': v => modShowLocs = v,
+            'mod-no-agua': v => modNoAguacate = v
         };
         Object.entries(modBinds).forEach(([id, fn]) =>
             document.getElementById(id).addEventListener('change', e => fn(e.target.checked)));
@@ -700,6 +760,12 @@
         });
         document.getElementById('mod-reset-j').addEventListener('click', () => { jonathanLocation = 1; jonathanDoorTimer = 0; nightModded = true; });
         document.getElementById('mod-reset-a').addEventListener('click', () => { aLocation = 1; aDoorTimer = 0; aInsideOffice = false; aBreachSide = null; nightModded = true; });
+        document.getElementById('mod-spawn-agua').addEventListener('click', () => { spawnMini(); nightModded = true; });
+        document.getElementById('mod-clear-agua').addEventListener('click', () => { minis = []; megaSummonT = 0; nightModded = true; });
+        document.getElementById('mod-preview-mega').addEventListener('click', () => {
+            document.getElementById('modal-mod-menu').classList.add('hidden');
+            triggerJumpscare('mega', true);
+        });
         document.getElementById('mod-preview-pay').addEventListener('click', () => showEnding('paycheck'));
         document.getElementById('mod-preview-fired').addEventListener('click', () => showEnding('fired'));
         document.getElementById('mod-reset-save').addEventListener('click', () => {
@@ -726,6 +792,16 @@
         document.getElementById('btn-door-right').addEventListener('click', () => toggleDoor('right'));
         document.getElementById('btn-light-right').addEventListener('click', () => toggleLight('right'));
         document.getElementById('btn-toggle-cam').addEventListener('click', toggleCameraMonitor);
+        const gameScreenEl = document.getElementById('screen-game');
+        gameScreenEl.addEventListener('pointermove', e => {
+            if (!officeCanvas) return;
+            const r = officeCanvas.getBoundingClientRect();
+            const sc = Math.max(r.width / officeCanvas.width, r.height / officeCanvas.height);
+            pointer.x = (e.clientX - r.left - (r.width - officeCanvas.width * sc) / 2) / sc;
+            pointer.y = (e.clientY - r.top - (r.height - officeCanvas.height * sc) / 2) / sc;
+        });
+        gameScreenEl.addEventListener('pointerleave', () => { pointer.x = pointer.y = -999; });
+
         document.getElementById('btn-retry').addEventListener('click', () => startGame(currentNight, isCustomNight));
         document.getElementById('btn-next-night').addEventListener('click', () => {
             if (pendingEnding) {
@@ -750,6 +826,9 @@
             } else if (type === 'a') {
                 customAIA_Level = Math.max(0, Math.min(20, customAIA_Level + val));
                 document.getElementById('custom-ai-a-val').innerText = customAIA_Level;
+            } else if (type === 'ag') {
+                customAguacateLevel = Math.max(0, Math.min(20, customAguacateLevel + val));
+                document.getElementById('custom-ai-ag-val').innerText = customAguacateLevel;
             }
         }
 
@@ -847,6 +926,12 @@
             aBreachSide = null;
             aCrossTimer = 0;
 
+            clearDeathSequence();
+            aguacateLevel = isCustom ? customAguacateLevel : AGUA_LEVELS[Math.min(4, Math.max(0, nightNum - 1))];
+            aguaInterval = Math.max(4, 32 - aguacateLevel * 1.5);
+            aguaNext = 8 + Math.random() * 5;       // first mini shows up after ~8-13s
+            minis = []; aguaBursts = []; megaSummonT = 0;
+
             const effectiveLevelJ = isCustomNight ? customAILevel : (currentNight * 4);
             const effectiveLevelA = isCustomNight ? customAIA_Level : (currentNight * 3);
 
@@ -937,6 +1022,7 @@
             usageElem.innerText = usageText;
             usageElem.className = `font-bold text-sm ml-1 ${usageFactor > 3 ? 'text-red-500' : (usageFactor > 1 ? 'text-yellow-400' : 'text-emerald-400')}`;
 
+            if (updateAguacates(dt)) return;
             const frozenJ = modDisableAI || modFreezeJ;
             const frozenA = modDisableAI || modFreezeA;
             if (!frozenJ) {
@@ -1422,15 +1508,191 @@
             };
             door(0, doorLeft);
             door(w * 0.76, doorRight);
+            drawMinis(ctx, w, h);
+        }
+
+        // ==================================================
+        // AGUACATES
+        // ==================================================
+        function spawnMini() {
+            if (megaSummonT > 0 || minis.length >= 7) return;
+            const used = new Set(minis.map(m => m.slot));
+            const free = MINI_SLOTS.map((_, i) => i).filter(i => !used.has(i));
+            if (!free.length) return;
+            minis.push({ slot: free[Math.floor(Math.random() * free.length)], prog: 0, born: performance.now() / 1000 });
+            blip(500, 950, 0.12, 'sine', 0.12);
+            if (minis.length >= 7) {                    // 7 piled up: summon the MEGA aguacate
+                megaSummonT = MEGA_SUMMON_TIME;
+                blip(80, 35, MEGA_SUMMON_TIME, 'sawtooth', 0.25);
+            }
+        }
+
+        // returns true if it triggered the mega jumpscare this frame
+        function updateAguacates(dt) {
+            for (const b of aguaBursts) b.age += dt;
+            aguaBursts = aguaBursts.filter(b => b.age < 0.5);
+            if (modNoAguacate) { minis = []; megaSummonT = 0; return false; }
+
+            if (megaSummonT > 0) {
+                megaSummonT -= dt;
+                if (megaSummonT <= 0) {
+                    megaSummonT = 0;
+                    if (modInvincible) { minis = []; return false; }
+                    triggerJumpscare('mega');
+                    return true;
+                }
+                return false;
+            }
+            if (aguacateLevel > 0) {
+                aguaNext -= dt;
+                if (aguaNext <= 0) { spawnMini(); aguaNext = aguaInterval * (0.8 + Math.random() * 0.4); }
+            }
+            if (!isCamMonitorOpen && officeCanvas) {
+                const w = officeCanvas.width, h = officeCanvas.height;
+                for (const m of minis) {
+                    const x = MINI_SLOTS[m.slot][0] * w, y = MINI_SLOTS[m.slot][1] * h;
+                    const hit = Math.abs(pointer.x - x) <= 34 && pointer.y >= y - 64 && pointer.y <= y + 12;
+                    m.prog = hit ? m.prog + dt / MINI_HOVER_TIME : Math.max(0, m.prog - dt * 2 / MINI_HOVER_TIME);
+                    if (m.prog >= 1) { m.dead = true; aguaBursts.push({ x, y: y - 28, age: 0 }); blip(420, 140, 0.14, 'square', 0.07); }
+                }
+                minis = minis.filter(m => !m.dead);
+            } else {
+                for (const m of minis) m.prog = Math.max(0, m.prog - dt);
+            }
+            return false;
+        }
+
+        function drawMiniAguacate(ctx, x, y, prog, t, seed, age) {
+            const p = Math.min(1, age / 0.25), c1 = 1.70158, c3 = c1 + 1;
+            const sc = p < 1 ? 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2) : 1;      // pop-in
+            const wob = Math.sin(t * 6 + seed * 2) * (0.05 + prog * 0.25);
+            const body = () => {
+                ctx.beginPath(); ctx.moveTo(0, -38);
+                ctx.bezierCurveTo(7, -38, 8, -27, 13, -20); ctx.bezierCurveTo(17, -12, 11, 0, 0, 0);
+                ctx.bezierCurveTo(-11, 0, -17, -12, -13, -20); ctx.bezierCurveTo(-8, -27, -7, -38, 0, -38); ctx.closePath();
+            };
+            ctx.save(); ctx.translate(x, y); ctx.scale(sc * 1.5, sc * 1.5);
+            ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(0, 1, 14, 4, 0, 0, 7); ctx.fill();
+            ctx.rotate(wob);
+            body(); ctx.fillStyle = '#2f5d1e'; ctx.fill(); ctx.strokeStyle = '#1c3a10'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.save(); ctx.translate(0, -19); ctx.scale(0.78, 0.82); ctx.translate(0, 19); body();
+            const fg = ctx.createLinearGradient(0, -38, 0, 0); fg.addColorStop(0, '#d9f09a'); fg.addColorStop(1, '#9ccc3c');
+            ctx.fillStyle = fg; ctx.fill(); ctx.restore();
+            ctx.fillStyle = '#6b3f1d'; ctx.beginPath(); ctx.arc(0, -11, 7, 0, 7); ctx.fill();            // pit
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(-2.7, -13, 2.2, 0, 7); ctx.fill();
+            ctx.beginPath(); ctx.arc(2.7, -13, 2.2, 0, 7); ctx.fill();
+            const lx = Math.sin(t * 1.3 + seed) * 0.6; ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(-2.7 + lx, -13, 1, 0, 7); ctx.fill();
+            ctx.beginPath(); ctx.arc(2.7 + lx, -13, 1, 0, 7); ctx.fill();
+            ctx.strokeStyle = '#2a140a'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, -10, 2.6, 0.15 * Math.PI, 0.85 * Math.PI); ctx.stroke();
+            ctx.restore();
+            if (prog > 0) {                                                                                 // hover progress ring
+                ctx.strokeStyle = 'rgba(250,204,21,0.95)'; ctx.lineWidth = 3; ctx.beginPath();
+                ctx.arc(x, y - 28, 40, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, prog)); ctx.stroke();
+            }
+        }
+
+        function drawMinis(ctx, w, h) {
+            const t = performance.now() / 1000;
+            for (const m of minis) drawMiniAguacate(ctx, MINI_SLOTS[m.slot][0] * w, MINI_SLOTS[m.slot][1] * h, m.prog, t, m.slot, t - m.born);
+            for (const b of aguaBursts) {
+                const k = b.age / 0.5;
+                ctx.fillStyle = `rgba(163,230,53,${1 - k})`;
+                for (let i = 0; i < 7; i++) {
+                    const a = (i / 7) * Math.PI * 2;
+                    ctx.beginPath(); ctx.arc(b.x + Math.cos(a) * k * 34, b.y + Math.sin(a) * k * 30, 4 * (1 - k) + 1, 0, 7); ctx.fill();
+                }
+            }
+        }
+
+        // The MEGA aguacate: charred, cracked, still smouldering. H = total height.
+        function drawMegaAguacate(ctx, cx, cy, H, t) {
+            const rnd = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+            const flick = 0.75 + 0.25 * Math.sin(t * 9) * Math.sin(t * 3.7);
+            const body = () => {
+                ctx.beginPath(); ctx.moveTo(0, -0.5 * H);
+                ctx.bezierCurveTo(0.12 * H, -0.5 * H, 0.15 * H, -0.28 * H, 0.27 * H, -0.12 * H);
+                ctx.bezierCurveTo(0.42 * H, 0.08 * H, 0.34 * H, 0.5 * H, 0, 0.5 * H);
+                ctx.bezierCurveTo(-0.34 * H, 0.5 * H, -0.42 * H, 0.08 * H, -0.27 * H, -0.12 * H);
+                ctx.bezierCurveTo(-0.15 * H, -0.28 * H, -0.12 * H, -0.5 * H, 0, -0.5 * H); ctx.closePath();
+            };
+            ctx.save(); ctx.translate(cx, cy);
+            const glow = ctx.createRadialGradient(0, 0.05 * H, 0.1 * H, 0, 0.05 * H, 0.58 * H);       // ember glow behind
+            glow.addColorStop(0, `rgba(249,115,22,${0.4 * flick})`); glow.addColorStop(1, 'rgba(249,115,22,0)');
+            ctx.fillStyle = glow; ctx.fillRect(-0.9 * H, -0.8 * H, 1.8 * H, 1.7 * H);
+
+            body();                                                                                      // charred skin
+            const g = ctx.createRadialGradient(-0.08 * H, -0.05 * H, 0.05 * H, 0, 0.1 * H, 0.52 * H);
+            g.addColorStop(0, '#3b2a18'); g.addColorStop(0.6, '#1a110a'); g.addColorStop(1, '#070403');
+            ctx.fillStyle = g; ctx.fill();
+
+            ctx.save(); body(); ctx.clip();
+            for (let i = 0; i < 36; i++) {                                                               // ash, soot, leftover olive skin
+                const px = (rnd(i * 3 + 1) - 0.5) * 0.8 * H, py = (rnd(i * 3 + 2) - 0.5) * H, pr = (0.03 + rnd(i * 3 + 3) * 0.09) * H;
+                ctx.fillStyle = ['rgba(150,140,125,0.16)', 'rgba(0,0,0,0.5)', 'rgba(58,70,24,0.45)', 'rgba(70,45,25,0.4)'][i % 4];
+                ctx.beginPath(); ctx.ellipse(px, py, pr, pr * (0.6 + rnd(i) * 0.6), rnd(i * 7) * 3, 0, 7); ctx.fill();
+            }
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.shadowColor = '#f97316'; ctx.shadowBlur = 0.03 * H;
+            for (let c = 0; c < 9; c++) {                                                                // glowing cracks
+                let x = (rnd(c * 11 + 1) - 0.5) * 0.7 * H, y = (rnd(c * 11 + 2) - 0.5) * 0.9 * H;
+                ctx.strokeStyle = `rgba(251,146,60,${0.2 + 0.55 * flick})`; ctx.lineWidth = Math.max(1.5, 0.008 * H);
+                ctx.beginPath(); ctx.moveTo(x, y);
+                for (let k = 0; k < 5; k++) { x += (rnd(c * 17 + k * 2 + 3) - 0.5) * 0.12 * H; y += (rnd(c * 17 + k * 2 + 4) - 0.3) * 0.1 * H; ctx.lineTo(x, y); }
+                ctx.stroke();
+            }
+            ctx.shadowBlur = 0;
+            for (const sx of [-1, 1]) {                                                                  // hollow eyes + angry brows
+                const ex = sx * 0.12 * H, ey = -0.1 * H;
+                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(ex, ey, 0.062 * H, 0.078 * H, sx * 0.25, 0, 7); ctx.fill();
+                ctx.strokeStyle = `rgba(249,115,22,${0.55 * flick})`; ctx.lineWidth = 0.008 * H; ctx.stroke();
+                ctx.fillStyle = `rgba(255,237,180,${0.8 + 0.2 * flick})`;
+                ctx.beginPath(); ctx.arc(ex + Math.sin(t * 2) * 0.006 * H, ey + 0.01 * H, 0.018 * H, 0, 7); ctx.fill();
+                ctx.strokeStyle = '#000'; ctx.lineWidth = 0.03 * H; ctx.beginPath();
+                ctx.moveTo(ex + sx * 0.08 * H, ey - 0.12 * H); ctx.lineTo(ex - sx * 0.08 * H, ey - 0.05 * H); ctx.stroke();
+            }
+            ctx.save(); ctx.translate(0, 0.07 * H); ctx.scale(1, 1 + 0.1 * Math.sin(t * 14)); ctx.translate(0, -0.07 * H);   // screaming mouth
+            ctx.beginPath(); ctx.moveTo(-0.17 * H, 0.07 * H);
+            for (let i = 1; i <= 7; i++) ctx.lineTo(-0.17 * H + 0.34 * H * i / 7, 0.07 * H + (i % 2 ? 0.035 * H : 0));
+            ctx.bezierCurveTo(0.2 * H, 0.28 * H, 0.1 * H, 0.36 * H, 0, 0.36 * H);
+            ctx.bezierCurveTo(-0.1 * H, 0.36 * H, -0.2 * H, 0.28 * H, -0.17 * H, 0.07 * H); ctx.closePath();
+            const mg = ctx.createLinearGradient(0, 0.07 * H, 0, 0.36 * H);
+            mg.addColorStop(0, '#050200'); mg.addColorStop(0.6, '#1a0a02'); mg.addColorStop(1, `rgba(234,88,12,${0.6 + 0.3 * flick})`);
+            ctx.fillStyle = mg; ctx.fill();
+            ctx.fillStyle = '#5a4630';
+            for (let i = 0; i < 6; i++) {
+                const tx = -0.15 * H + i * 0.06 * H;
+                ctx.beginPath(); ctx.moveTo(tx, 0.075 * H); ctx.lineTo(tx + 0.05 * H, 0.075 * H); ctx.lineTo(tx + 0.025 * H, 0.13 * H); ctx.fill();
+            }
+            ctx.restore();
+            ctx.restore();                                                                               // end clip
+
+            body(); ctx.strokeStyle = '#0a0604'; ctx.lineWidth = 0.02 * H; ctx.stroke();                 // scorched rim
+            ctx.shadowColor = '#f97316'; ctx.shadowBlur = 0.03 * H;
+            ctx.strokeStyle = `rgba(249,115,22,${0.5 * flick})`; ctx.lineWidth = 0.006 * H; ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            for (let i = 0; i < 7; i++) {                                                                // smoke
+                const k = (t * 0.35 + i / 7) % 1;
+                const sx = (rnd(i + 90) - 0.5) * 0.4 * H + Math.sin(t * 1.5 + i) * 0.04 * H, sy = -0.45 * H - k * 0.45 * H;
+                ctx.fillStyle = `rgba(110,100,95,${0.28 * (1 - k)})`; ctx.beginPath(); ctx.arc(sx, sy, (0.04 + 0.08 * k) * H, 0, 7); ctx.fill();
+            }
+            for (let i = 0; i < 14; i++) {                                                               // rising embers
+                const k = (t * 0.5 + rnd(i + 200)) % 1, ex = (rnd(i + 300) - 0.5) * 0.8 * H;
+                ctx.fillStyle = `rgba(251,146,60,${0.9 * (1 - k)})`;
+                ctx.fillRect(ex + Math.sin(t * 3 + i) * 0.02 * H, 0.4 * H - k * 0.95 * H, 0.01 * H + 1, 0.01 * H + 1);
+            }
+            ctx.restore();
         }
 
         function debugLocs(ctx, w, h) {
             if (!modShowLocs || !ctx) return;
             const N = { 1: 'Stage', 2: 'Treadmills', 3: 'Lockers', 4: 'Left Hall', 5: 'Right Hall', 6: 'Left Door', 7: 'Right Door' };
-            ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(12, h - 70, 200, 52);
+            ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(12, h - 90, 200, 72);
             ctx.fillStyle = '#c084fc'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'left';
             ctx.fillText('JONATHAN: ' + N[jonathanLocation], 20, h - 48);
             ctx.fillText('A: ' + (aInsideOffice ? 'IN OFFICE' : N[aLocation]), 20, h - 28);
+            ctx.fillText('AGUACATES: ' + minis.length + '/7', 20, h - 68);
         }
 
         function renderGame() {
@@ -1442,7 +1704,7 @@
             }
         }
 
-        // Golden aguacate trophy (unlocked by beating the 2/20 custom night without mods)
+        // Golden aguacate trophy (unlocked by beating the custom night with every dude at 20, no mods)
         function drawAguacateTrophy(ctx, x, y) {
             const t = performance.now() / 1000;
             ctx.save(); ctx.translate(x, y);
@@ -1556,6 +1818,11 @@
             if (aInsideOffice) {
                 drawASprite(officeCtx, w * 0.5, h * 0.6, 140, 160);
             }
+            if (megaSummonT > 0) {                       // the mega aguacate rises...
+                const k = 1 - megaSummonT / MEGA_SUMMON_TIME, sh = 10 * k;
+                officeCtx.fillStyle = `rgba(0,0,0,${0.6 * k})`; officeCtx.fillRect(0, 0, w, h);
+                drawMegaAguacate(officeCtx, w / 2 + (Math.random() - 0.5) * sh, h * 0.62 + (Math.random() - 0.5) * sh, h * (0.25 + 0.95 * k), performance.now() / 1000);
+            }
             vignette(officeCtx, w, h, 0.65);
         }
 
@@ -1592,35 +1859,80 @@
             cameraFX(ctx, w, h);
         }
 
-        function triggerJumpscare(byWho = 'jonathan') {
-            if (modInvincible) return;
+        function clearDeathSequence() {
+            deathTimers.forEach(id => { clearTimeout(id); clearInterval(id); });
+            deathTimers = [];
+            if (jsRaf) cancelAnimationFrame(jsRaf);
+            jsRaf = null;
+            [jumpscareAudio, voicelineAudio, aguacateScream, aguacateVoice].forEach(au => {
+                au.pause(); try { au.currentTime = 0; } catch (e) {} au.volume = 1;
+            });
+        }
+
+        function fadeOutAudio(au, ms) {
+            const v0 = au.volume, t0 = performance.now();
+            const iv = setInterval(() => {
+                const k = (performance.now() - t0) / ms;
+                if (k >= 1) { clearInterval(iv); au.pause(); au.volume = 1; } else au.volume = Math.max(0, v0 * (1 - k));
+            }, 50);
+            deathTimers.push(iv);
+        }
+
+        // Death sequence: jumpscare -> fade to red -> fade to black -> "YOU DIED" + voiceline + restart
+        function triggerJumpscare(byWho = 'jonathan', force = false) {
+            if (isGameOver || (modInvincible && !force)) return;
             isGameOver = true;
             killedBy = byWho;
+            clearDeathSequence();
 
             document.getElementById('screen-game').classList.add('hidden');
             document.getElementById('screen-gameover').classList.remove('hidden');
 
-            const sub = document.getElementById('death-subtitle');
-            if (sub) {
-                sub.innerText = byWho === 'jonathan' ? 'Jonathan got you!' : 'Character A got you!';
-            }
+            const red = document.getElementById('death-red'), black = document.getElementById('death-black');
+            const hud = document.getElementById('death-text-hud'), cont = document.getElementById('jumpscare-container');
+            [red, black, hud].forEach(el => { el.style.transition = 'none'; el.style.opacity = '0'; });
+            hud.style.pointerEvents = 'none';
+            cont.style.display = 'flex';
+            void red.offsetWidth;
 
-            jumpscareAudio.currentTime = 0;
-            jumpscareAudio.play().catch(e => console.log('Jumpscare audio error:', e));
+            const names = { jonathan: 'Jonathan got you!', a: 'Character A got you!', mega: 'The Mega Aguacate got you!' };
+            document.getElementById('death-subtitle').innerText = names[byWho] || names.jonathan;
 
-            if (jumpscareCtx) {
+            const sfx = byWho === 'mega'
+                ? { scream: aguacateScream, voice: aguacateVoice }
+                : { scream: jumpscareAudio, voice: voicelineAudio };
+            sfx.scream.currentTime = 0; sfx.scream.volume = 1;
+            sfx.scream.play().catch(e => console.log('Jumpscare audio error:', e));
+
+            // keep redrawing so the mega aguacate's embers/smoke animate and everything slowly zooms
+            const t0 = performance.now();
+            const frame = () => {
+                if (!jumpscareCtx) return;
+                const t = (performance.now() - t0) / 1000, z = 1 + Math.min(0.2, t * 0.1);
                 jumpscareCtx.clearRect(0, 0, 400, 400);
-                if (byWho === 'jonathan') {
-                    drawJonathanSprite(jumpscareCtx, 200, 200, 260, 300, 1.8);
-                } else {
-                    drawASprite(jumpscareCtx, 200, 200, 200, 190);
-                }
-            }
+                jumpscareCtx.save(); jumpscareCtx.translate(200, 200); jumpscareCtx.scale(z, z); jumpscareCtx.translate(-200, -200);
+                if (byWho === 'jonathan') drawJonathanSprite(jumpscareCtx, 200, 200, 260, 300, 1.8);
+                else if (byWho === 'mega') drawMegaAguacate(jumpscareCtx, 200, 218, 330, t);
+                else drawASprite(jumpscareCtx, 200, 200, 200, 190);
+                jumpscareCtx.restore();
+                jsRaf = requestAnimationFrame(frame);
+            };
+            frame();
 
-            setTimeout(() => {
-                voicelineAudio.currentTime = 0;
-                voicelineAudio.play().catch(e => console.log('Voiceline error:', e));
-            }, 1800);
+            const at = (ms, fn) => deathTimers.push(setTimeout(fn, ms));
+            at(1500, () => { red.style.transition = 'opacity 1000ms ease-in'; red.style.opacity = '0.92'; });
+            at(2500, () => {
+                black.style.transition = 'opacity 1000ms ease-in'; black.style.opacity = '1';
+                fadeOutAudio(sfx.scream, 1000);
+            });
+            at(3600, () => {
+                if (jsRaf) cancelAnimationFrame(jsRaf);
+                jsRaf = null;
+                cont.style.display = 'none';
+                hud.style.transition = 'opacity 900ms ease-out'; hud.style.opacity = '1'; hud.style.pointerEvents = 'auto';
+                sfx.voice.currentTime = 0;
+                sfx.voice.play().catch(e => console.log('Voiceline error:', e));
+            });
         }
 
         function winNight() {
@@ -1635,14 +1947,14 @@
             let msg = '';
             pendingEnding = null;
             if (isCustomNight) {
-                if (customAILevel === 20 && customAIA_Level === 20) {   // the "2/20" challenge
+                if (customAILevel === 20 && customAIA_Level === 20 && customAguacateLevel === 20) {   // the "3/20" challenge (all the dudes at 20)
                     if (modded) {
-                        msg = '2/20 cleared with mods. Cheaters don\'t get trophies.';
+                        msg = '3/20 cleared with mods. Cheaters don\'t get trophies.';
                     } else if (!save.trophy) {
                         save.trophy = true; writeSave();
                         msg = '\u{1F951} GOLDEN AGUACATE TROPHY UNLOCKED! It now sits on your desk.';
                     } else {
-                        msg = '\u{1F951} 2/20 cleared again! Your trophy stays on the desk.';
+                        msg = '\u{1F951} 3/20 cleared again! Your trophy stays on the desk.';
                     }
                 }
             } else {
